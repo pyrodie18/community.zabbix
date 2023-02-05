@@ -102,7 +102,7 @@
   args:
     creates: /etc/zabbix/schema.done
     executable: /bin/bash
-    warn: false
+    warn: "{{ produce_warn | default(omit) }}"
   environment:
     PGPASSWORD: "{{ zabbix_server_dbpassword }}"
   when:
@@ -125,7 +125,7 @@
   args:
     creates: /etc/zabbix/timescaledb.done
     executable: /bin/bash
-    warn: false
+    warn: "{{ produce_warn | default(omit) }}"
   environment:
     PGPASSWORD: "{{ zabbix_server_dbpassword }}"
   when:
@@ -175,7 +175,7 @@
   args:
     creates: /etc/zabbix/schema.done
     executable: /bin/bash
-    warn: false
+    warn: "{{ produce_warn | default(omit) }}"
   environment:
     PGPASSWORD: "{{ zabbix_server_dbpassword }}"
   when:
@@ -195,7 +195,7 @@
     -f images.sql && touch /etc/zabbix/images.done
   args:
     creates: /etc/zabbix/images.done
-    warn: false
+    warn: "{{ produce_warn | default(omit) }}"
   environment:
     PGPASSWORD: "{{ zabbix_server_dbpassword }}"
   when:
@@ -215,7 +215,7 @@
     -f data.sql && touch /etc/zabbix/data.done
   args:
     creates: /etc/zabbix/data.done
-    warn: false
+    warn: "{{ produce_warn | default(omit) }}"
   environment:
     PGPASSWORD: "{{ zabbix_server_dbpassword }}"
   when:
