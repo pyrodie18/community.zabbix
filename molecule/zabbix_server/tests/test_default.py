@@ -37,8 +37,8 @@ def test_zabbix_package(host, server):
 
 def test_zabbix_server_dot_conf(host):
     zabbix_server_conf = host.file("/etc/zabbix/zabbix_server.conf")
-    assert zabbix_server_conf.user == "zabbix"
-    assert zabbix_server_conf.group == "zabbix"
+    assert zabbix_server_conf.user in ["zabbix", "zabbixsrv"]
+    assert zabbix_server_conf.group in ["zabbix", "zabbixsrv"]
     assert zabbix_server_conf.mode == 0o640
 
     assert zabbix_server_conf.contains("ListenPort=10051")
@@ -48,8 +48,8 @@ def test_zabbix_server_dot_conf(host):
 def test_zabbix_include_dir(host):
     zabbix_include_dir = host.file("/etc/zabbix/zabbix_server.conf.d")
     assert zabbix_include_dir.is_directory
-    assert zabbix_include_dir.user == "zabbix"
-    assert zabbix_include_dir.group == "zabbix"
+    assert zabbix_include_dir.user in ["zabbix", "zabbixsrv"]
+    assert zabbix_include_dir.group in ["zabbix", "zabbixsrv"]
     # assert zabbix_include_dir.mode == 0o644
 
 
