@@ -5,12 +5,12 @@
   set_fact:
     zabbix_short_version: "{{ zabbix_server_version | regex_replace('\\.', '') }}"
 
-- name: "RedHat | Set Zabbix user/group (RHEL 9)"
-  set_fact:
-    zabbix_os_user: zabbixsrv
-  when:
-    - ansible_distribution_major_version == "9"
-    - zabbix_server_version is version('6.0', '<=')
+# - name: "RedHat | Set Zabbix user/group (RHEL 9)"
+#   set_fact:
+#     zabbix_os_user: zabbixsrv
+#   when:
+#     - ansible_distribution_major_version == "9"
+#     - zabbix_server_version is version('6.0', '<=')
 
 - name: "RedHat | Use Zabbix package name"
   set_fact:
