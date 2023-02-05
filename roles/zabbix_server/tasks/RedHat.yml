@@ -8,6 +8,8 @@
 - name: "RedHat | Set Zabbix user/group (RHEL 9)"
   set_fact:
     zabbix_os_user: zabbixsrv
+    zabbix_server_config: /etc/zabbix_server.conf
+    zabbix_server_logfile: /var/log/zabbixsrv/zabbix_server.log
   when:
     - ansible_distribution_major_version == "9"
     - zabbix_server_version is version('6.0', '<=')
@@ -66,7 +68,7 @@
     name: "{{ zabbix_server_username | default('zabbix') }}"
     comment: Zabbix Monitoring System
     uid: "{{ zabbix_server_userid | default(omit) }}"
-    group: zabbix
+    group: "{{ zabbix_server_groupname | default('zabbix') }}"
   become: true
   when:
     - zabbix_repo == "epel"

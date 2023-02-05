@@ -26,7 +26,7 @@
 - name: "Configure zabbix-server"
   template:
     src: zabbix_server.conf.j2
-    dest: /etc/zabbix/zabbix_server.conf
+    dest: "{{ zabbix_server_config }}"
     owner: "{{ zabbix_os_user }}"
     group: "{{ zabbix_os_user }}"
     mode: "{{ zabbix_server_conf_mode }}"

@@ -1,14 +1,14 @@
 ---
 # defaults file for zabbix_server
 # zabbix_server_version:
+zabbix_os_user: zabbix
+zabbix_server_config: /etc/zabbix/zabbix_server.conf
+
 zabbix_server_database: pgsql
 zabbix_database_creation: true
 zabbix_server_install_database_client: true
 zabbix_service_state: started
 zabbix_service_enabled: true
-zabbix_repo: zabbix
-zabbix_server_version_minor: "*"
-zabbix_server_package_state: present
 
 # Deb Variables
 zabbix_server_apt_priority:
@@ -16,6 +16,9 @@ zabbix_server_install_recommends: true
 zabbix_server_conf_mode: 0640
 
 # Yum Variables
+zabbix_server_version_minor: "*"
+zabbix_server_package_state: present
+zabbix_repo: zabbix
 zabbix_repo_yum_gpgcheck: 0
 zabbix_repo_yum_schema: https
 zabbix_repo_yum_disabled: "*"
@@ -58,8 +61,8 @@ zabbix_server_logtype: file
 zabbix_server_logfile: /var/log/zabbix/zabbix_server.log
 zabbix_server_logfilesize: 10
 zabbix_server_debuglevel: 3
-zabbix_server_pidfile: /var/run/zabbix/zabbix_server.pid
-zabbix_server_socketdir: /var/run/zabbix
+zabbix_server_pidfile:
+zabbix_server_socketdir:
 zabbix_server_real_dbhost:
 zabbix_server_dbhost: localhost
 zabbix_server_dbname: zabbix-server
