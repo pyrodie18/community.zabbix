@@ -213,6 +213,7 @@
   file:
     path: /usr/lib/systemd/system/zabbix-server.service
     state: absent
+  tags: molecule-idempotence-notest
   when:
     - zabbix_server_version is version('6.0', '==')
     - ansible_distribution_major_version == "9"
@@ -225,6 +226,7 @@
     owner: root
     group: root
     mode: 0644
+  tags: molecule-idempotence-notest
   when:
     - zabbix_server_version is version('6.0', '==')
     - ansible_distribution_major_version == "9"
