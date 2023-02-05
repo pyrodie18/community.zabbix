@@ -14,6 +14,7 @@ platforms:
     groups:
       - ${MY_MOLECULE_DATABASE:-mysql}
       - ${MY_MOLECULE_VERSION:-6.2}
+      - ${MY_MOLECULE_INTERPRETER:-python3}
 
 provisioner:
   name: ansible
@@ -24,8 +25,10 @@ provisioner:
     ANSIBLE_ROLES_PATH: $HOME/.ansible/collections/ansible_collections/community/zabbix/roles
   inventory:
     group_vars:
-      all:
+      python3:
         ansible_python_interpreter: /usr/bin/python3
+      python:
+        ansible_python_interpreter: /usr/bin/python
       v62:
         zabbix_server_version: 6.2
       v60:

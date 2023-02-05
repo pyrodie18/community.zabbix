@@ -37,6 +37,10 @@ jobs:
           - v62
           - v60
           - v50
+        include:
+          - interpreter: python3
+          - interpreter: python
+            container: centos7
         exclude:
           - container: centos7
             version: v60
@@ -47,6 +51,8 @@ jobs:
           - container: ubuntu1804
             version: v62
           - container: ubuntu2204
+            version: v50
+          - container: rockylinux9
             version: v50
     steps:
       - name: Check out code
@@ -76,5 +82,6 @@ jobs:
           MY_MOLECULE_IMAGE=${{ matrix.container }}
           MY_MOLECULE_VERSION=${{ matrix.version }}
           MY_MOLECULE_DATABASE=${{ matrix.database }}
+          MY_MOLECULE_INTERPRETER=${{ matrix.interpreter }}
           MY_MOLECULE_DOCKER_COMMAND=${{ matrix.command }}
           molecule test -s ${{ matrix.collection_role }}
