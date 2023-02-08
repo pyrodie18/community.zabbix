@@ -37,6 +37,10 @@ jobs:
           - v62
           - v60
           - v50
+        include:
+          - interpreter: python3
+          - interpreter: python
+            container: centos7
         exclude:
           - container: centos7
             version: v60
@@ -54,10 +58,10 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v1
 
-      - name: Set up Python 3.7
+      - name: Set up Python 3.9
         uses: actions/setup-python@v1
         with:
-          python-version: 3.7
+          python-version: 3.9
 
       - name: Install dependencies
         run: |
@@ -78,5 +82,6 @@ jobs:
           MY_MOLECULE_IMAGE=${{ matrix.container }}
           MY_MOLECULE_VERSION=${{ matrix.version }}
           MY_MOLECULE_DATABASE=${{ matrix.database }}
+          MY_MOLECULE_INTERPRETER=${{ matrix.interpreter }}
           MY_MOLECULE_DOCKER_COMMAND=${{ matrix.command }}
           molecule test -s ${{ matrix.collection_role }}
