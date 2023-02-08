@@ -10,6 +10,8 @@
     zabbix_os_user: zabbixsrv
     zabbix_server_config: /etc/zabbix_server.conf
     zabbix_server_logfile: /var/log/zabbixsrv/zabbix_server.log
+    zabbix_server_pidfile: /tmp/zabbix_server.pid
+    zabbix_server_socketdir: /tmp
   when:
     - ansible_distribution_major_version == "9"
     - zabbix_server_version is version('6.0', '<=')
