@@ -5,14 +5,18 @@
 
 - name: Determine Latest Supported Zabbix Version
   set_fact:
-    zabbix_proxy_version: "{{ zabbix_valid_proxy_versions[ansible_distribution_major_version][0] | default(6.0) }}"
-  when: zabbix_proxy_version is not defined
+    zabbix_proxy_version: "{{ zabbix_valid_proxy_versions[ansible_distribution_major_version][0] | default(6.2) }}"
+  when: zabbix_proxy_version is not defined or zabbix_proxy_version is none
 
-- name: "Replace Sangoma with RedHat task"
+- name: Set More Variables
   set_fact:
-    ansible_os_family: "RedHat"
-  when:
-    - ansible_os_family == 'Sangoma'
+    zabbix_proxy_db_long: "{{ 'postgresql' if zabbix_proxy_database == 'pgsql' else zabbix_proxy_database }}"
+    zabbix_valid_version: "{{ zabbix_proxy_version in zabbix_valid_proxy_versions[ansible_distribution_major_version] }}"
+
+- name: Stopping Install of Invalid Version
+  fail:
+    msg: Zabbix version {{ zabbix_proxy_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
+  when: not zabbix_valid_version
 
 - name: "Set default ip address for zabbix_proxy_ip"
   set_fact:
@@ -21,17 +25,11 @@
     - zabbix_proxy_ip is not defined
     - "'ansible_default_ipv4' in hostvars[inventory_hostname]"
 
-- name: "Set OS dependent variables"
-  include_vars: "{{ item }}"
-  with_first_found:
-    - "../vars/{{ ansible_distribution }}.yml"
-    - "../vars/main.yml"
+- name: "Complete OS Specific Tasks"
+  include: "{{ ansible_os_family }}.yml"
 
-- name: "Install the correct repository"
-  include_tasks: "{{ ansible_os_family }}.yml"
-
-- name: "Installing the {{ zabbix_proxy_database_long }} database"
-  include_tasks: "{{ zabbix_proxy_database_long }}.yml"
+- name: "Installing the database"
+  include: "{{ zabbix_proxy_db_long }}.yml"
 
 - name: "Create include dir zabbix-proxy"
   file:
@@ -102,15 +100,28 @@
   notify: restart zabbix-proxy
   become: true
 
+- name: "Installing the Zabbix-api package on localhost"
+  pip:
+    name: zabbix-api
+    state: present
+  register: zabbix_api_package_installed
+  until: zabbix_api_package_installed is succeeded
+  delegate_to: localhost
+  run_once: true
+  become: "{{ zabbix_proxy_become_on_localhost }}"
+  when:
+    - zabbix_install_pip_packages | bool
+    - zabbix_api_create_proxy | bool
+  tags:
+    - api
+
 - name: Ensure proxy definition is up-to-date (added/updated/removed)
-  vars:
-    gather_facts: false
-    ansible_user: "{{ zabbix_api_login_user }}"
-    ansible_connection: httpapi
-    # Can't think of a way to make http_login_* vars be undefined -(
-    http_login_user: "{{ zabbix_api_http_user | default(zabbix_http_user | default(-42)) }}"
-    http_login_password: "{{ zabbix_api_http_password | default(zabbix_http_password | default(-42)) }}"
-  community.zabbix.zabbix_proxy:
+  zabbix_proxy:
+    server_url: "{{ zabbix_api_server_url }}"
+    http_login_user: "{{ zabbix_api_http_user |  default(omit)) }}"
+    http_login_password: "{{ zabbix_api_http_password | default(omit)) }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     state: "{{ zabbix_proxy_state }}"
     status: "{{ zabbix_proxy_status }}"
     proxy_name: "{{ zabbix_proxy_name }}"
@@ -118,12 +129,14 @@
     interface: "{{ zabbix_proxy_interface }}"
     tls_psk: "{{ zabbix_proxy_tlspsk_secret | default(omit) }}"
     tls_psk_identity: "{{ zabbix_proxy_tlspskidentity | default(omit) }}"
-    tls_subject: "{{ zabbix_proxy_tls_subject | default(omit) }}"
-    tls_connect: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsaccept if zabbix_proxy_tlsaccept else 'no_encryption'] }}"
-    tls_accept: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsconnect if zabbix_proxy_tlsconnect else 'no_encryption'] }}"
+    tls_subject: "{{ zabbix_proxy_tlsservercertsubject | default(omit) }}"
+    tls_accept: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsaccept if zabbix_proxy_tlsaccept else 'no_encryption'] }}"
+    tls_connect: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsconnect if zabbix_proxy_tlsconnect else 'no_encryption'] }}"
+    validate_certs: "{{ zabbix_api_validate_certs | default(omit) }}"
+    timeout: "{{ zabbix_api_timeout }}"
   when:
     - zabbix_api_create_proxy | bool
-  delegate_to: "{{ zabbix_api_server_host }}"
+  delegate_to: localhost
   become: false
   tags:
     - api
