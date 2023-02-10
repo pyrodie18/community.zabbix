@@ -54,17 +54,6 @@
     - zabbix-proxy
     - database
 
-- name: "MySQL | Get the file for schema.sql"
-  shell: ls -1 {{ datafiles_path }}/{{ 'schema' if zabbix_proxy_version is version('6.0', '<') else 'proxy' }}.sq*
-  changed_when: false
-  when:
-    - zabbix_database_sqlload
-    - zabbix_repo != "epel"
-  register: ls_output_create
-  tags:
-    - zabbix-proxy
-    - database
-
 - name: "MySQL | Check if we have done files"
   stat:
     path: /etc/zabbix/schema.done
@@ -134,7 +123,7 @@
     encoding: "{{ zabbix_proxy_dbencoding }}"
     collation: "{{ zabbix_proxy_dbcollation }}"
     state: import
-    target: "{{ ls_output_create.stdout }}"
+    target: "{{ ls_output_schema.stdout }}"
   when:
     - zabbix_database_sqlload
     - zabbix_repo != "epel"

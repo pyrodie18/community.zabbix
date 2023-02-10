@@ -12,11 +12,27 @@
   set_fact:
     zabbix_proxy_db_long: "{{ 'postgresql' if zabbix_proxy_database == 'pgsql' else zabbix_proxy_database }}"
     zabbix_valid_version: "{{ zabbix_proxy_version in zabbix_valid_proxy_versions[ansible_distribution_major_version] }}"
+    zabbix_short_version: "{{ zabbix_proxy_version | regex_replace('\\.', '') }}"
 
 - name: Stopping Install of Invalid Version
   fail:
     msg: Zabbix version {{ zabbix_proxy_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
   when: not zabbix_valid_version
+
+- name: Set Path to SQL File
+  set_fact:
+    datafile_path: "{{ db_file_path[zabbix_short_version] }}"
+
+- name: "Get the file for database schema"
+  shell: ls -1 {{ db_file_path[zabbix_short_version] }}
+  changed_when: false
+  when:
+    - zabbix_database_sqlload
+    - zabbix_repo != "epel"
+  register: ls_output_schema
+  tags:
+    - zabbix-proxy
+    - database
 
 - name: "Set default ip address for zabbix_proxy_ip"
   set_fact:
