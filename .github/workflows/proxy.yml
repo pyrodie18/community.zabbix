@@ -42,16 +42,6 @@ jobs:
           - interpreter: python
             container: centos7
         exclude:
-          - container: centos7
-            version: v60
-          - container: centos7
-            version: v62
-          - container: debian10
-            version: v62
-          - container: ubuntu1804
-            version: v62
-          - container: ubuntu2204
-            version: v50
           - container: rockylinux9
             version: v50
     steps:
