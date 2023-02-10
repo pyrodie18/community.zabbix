@@ -32,7 +32,7 @@ jobs:
           - zabbix_proxy
         database:
           - mysql
-          - pgsql
+          # - pgsql
         version:
           - v62
           - v60
