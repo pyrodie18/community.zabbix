@@ -23,6 +23,16 @@
   set_fact:
     datafile_path: "{{ db_file_path[zabbix_short_version] }}"
 
+- name: "Set default ip address for zabbix_proxy_ip"
+  set_fact:
+    zabbix_proxy_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4'].address }}"
+  when:
+    - zabbix_proxy_ip is not defined
+    - "'ansible_default_ipv4' in hostvars[inventory_hostname]"
+
+- name: "Complete OS Specific Tasks"
+  include: "{{ ansible_os_family }}.yml"
+
 - name: "Get the file for database schema"
   shell: ls -1 {{ db_file_path[zabbix_short_version] }}
   changed_when: false
@@ -33,16 +43,6 @@
   tags:
     - zabbix-proxy
     - database
-
-- name: "Set default ip address for zabbix_proxy_ip"
-  set_fact:
-    zabbix_proxy_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4'].address }}"
-  when:
-    - zabbix_proxy_ip is not defined
-    - "'ansible_default_ipv4' in hostvars[inventory_hostname]"
-
-- name: "Complete OS Specific Tasks"
-  include: "{{ ansible_os_family }}.yml"
 
 - name: "Installing the database"
   include: "{{ zabbix_proxy_db_long }}.yml"
