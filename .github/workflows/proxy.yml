@@ -31,8 +31,8 @@ jobs:
         collection_role:
           - zabbix_proxy
         database:
-          - mysql
-          # - pgsql
+          # - mysql
+          - pgsql
         version:
           - v62
           - v60
