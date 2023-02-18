@@ -32,7 +32,8 @@ jobs:
           - zabbix_proxy
         database:
           # - mysql
-          - pgsql
+          # - pgsql
+          - sqlite3
         version:
           - v62
           - v60
