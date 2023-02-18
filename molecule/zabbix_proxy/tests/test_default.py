@@ -39,8 +39,8 @@ def test_zabbix_package(host, proxy):
 
 def test_zabbix_proxy_dot_conf(host):
     zabbix_proxy_conf = host.file("/etc/zabbix/zabbix_proxy.conf")
-    assert zabbix_proxy_conf.user == "zabbix"
-    assert zabbix_proxy_conf.group == "zabbix"
+    assert zabbix_proxy_conf.user in ["zabbix", "zabbixsrv"]
+    assert zabbix_proxy_conf.group in ["zabbix", "zabbixsrv"]
     assert zabbix_proxy_conf.mode == 0o644
 
     assert zabbix_proxy_conf.contains("ListenPort=10051")
@@ -50,8 +50,8 @@ def test_zabbix_proxy_dot_conf(host):
 def test_zabbix_include_dir(host):
     zabbix_include_dir = host.file("/etc/zabbix/zabbix_proxy.conf.d")
     assert zabbix_include_dir.is_directory
-    assert zabbix_include_dir.user == "zabbix"
-    assert zabbix_include_dir.group == "zabbix"
+    assert zabbix_include_dir.user in ["zabbix", "zabbixsrv"]
+    assert zabbix_include_dir.group in ["zabbix", "zabbixsrv"]
     # assert zabbix_include_dir.mode == 0o644
 
 
