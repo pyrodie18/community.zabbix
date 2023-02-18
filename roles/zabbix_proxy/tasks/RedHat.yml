@@ -51,10 +51,10 @@
 - name: "RedHat | Set Zabbix user/group (RHEL 9)"
   set_fact:
     zabbix_os_user: zabbixsrv
-    # zabbix_server_config: /etc/zabbix_server.conf
-    # zabbix_server_logfile: /var/log/zabbixsrv/zabbix_server.log
-    # zabbix_server_pidfile: /tmp/zabbix_server.pid
-    # zabbix_server_socketdir: /tmp
+    zabbix_proxy_config: /etc/zabbix_proxy.conf
+    zabbix_proxy_logfile: /var/log/zabbixsrv/zabbix_proxy.log
+    zabbix_proxy_pidfile: /tmp/zabbix_proxy.pid
+    zabbix_proxy_socketdir: /tmp
   when:
     - ansible_distribution_major_version == "9"
     - zabbix_proxy_version is version('6.0', '<=')
