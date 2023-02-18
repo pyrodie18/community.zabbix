@@ -162,3 +162,5 @@ zabbix_proxy_interface:
   ip: "{{ zabbix_proxy_ip }}"
   dns: "{{ ansible_fqdn }}"
   port: "{{ zabbix_proxy_listenport }}"
+
+zabbix_proxy_cat_cmd: cat
