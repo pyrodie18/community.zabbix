@@ -31,8 +31,8 @@ jobs:
         collection_role:
           - zabbix_proxy
         database:
-          # - mysql
-          # - pgsql
+          - mysql
+          - pgsql
           - sqlite3
         version:
           - v62
