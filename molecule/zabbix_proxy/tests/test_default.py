@@ -38,7 +38,17 @@ def test_zabbix_package(host, proxy):
 
 
 def test_zabbix_proxy_dot_conf(host):
-    zabbix_proxy_conf = host.file("/etc/zabbix/zabbix_proxy.conf")
+    found = False
+    for file_name in [
+        "/etc/zabbix/zabbix_proxy.conf",
+        "/etc/zabbix_proxy.conf",
+    ]:
+        if host.file(file_name).exists:
+            found = True
+            break
+
+    assert found
+    zabbix_proxy_conf = host.file(file_name)
     assert zabbix_proxy_conf.user in ["zabbix", "zabbixsrv"]
     assert zabbix_proxy_conf.group in ["zabbix", "zabbixsrv"]
     assert zabbix_proxy_conf.mode == 0o644
@@ -56,8 +66,18 @@ def test_zabbix_include_dir(host):
 
 
 def test_zabbix_proxy_logfile(host):
-    zabbix_logfile = host.file("/var/log/zabbix/zabbix_proxy.log")
+    found = False
+    for file_name in [
+        "/var/log/zabbix/zabbix_proxy.log",
+        "/var/log/zabbixsrv/zabbix_proxy.log",
+    ]:
+        if host.file(file_name).exists:
+            found = True
+            break
 
+    assert found
+
+    zabbix_logfile = host.file(file_name)
     assert not zabbix_logfile.contains("Access denied for user")
     assert not zabbix_logfile.contains("database is down: reconnecting")
     assert zabbix_logfile.contains("current database version")
