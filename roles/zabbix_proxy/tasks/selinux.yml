@@ -20,3 +20,21 @@
   become: true
   tags:
     - zabbix-proxy
+
+- name: "Allow zabbix-proxy to open connections (SELinux)"
+  ansible.posix.seboolean:
+    name: zabbix_can_network
+    persistent: true
+    state: true
+  become: true
+  when: ansible_selinux.status == "enabled"
+  tags: selinux
+
+- name: "Allow zabbix-proxy to connect to zabbix_proxy_preprocessing.sock (SELinux)"
+  ansible.posix.seboolean:
+    name: daemons_enable_cluster_mode
+    persistent: true
+    state: true
+  become: true
+  when: ansible_selinux.status == "enabled"
+  tags: selinux
