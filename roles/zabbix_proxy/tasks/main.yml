@@ -50,8 +50,8 @@
 - name: "Create include dir zabbix-proxy"
   file:
     path: "{{ zabbix_proxy_include }}"
-    owner: zabbix
-    group: zabbix
+    owner: "{{ zabbix_os_user }}"
+    group: "{{ zabbix_os_user }}"
     mode: "{{ zabbix_proxy_include_mode }}"
     state: directory
   become: true
@@ -59,8 +59,8 @@
 - name: "Create module dir zabbix-proxy"
   file:
     path: "{{ zabbix_proxy_loadmodulepath }}"
-    owner: zabbix
-    group: zabbix
+    owner: "{{ zabbix_os_user }}"
+    group: "{{ zabbix_os_user }}"
     state: directory
     mode: "0755"
   become: true
@@ -78,8 +78,8 @@
   copy:
     dest: "{{ zabbix_proxy_tlspskfile }}"
     content: "{{ zabbix_proxy_tlspsk_secret }}"
-    owner: zabbix
-    group: zabbix
+    owner: "{{ zabbix_os_user }}"
+    group: "{{ zabbix_os_user }}"
     mode: 0400
   become: true
   when:
@@ -110,8 +110,8 @@
   template:
     src: zabbix_proxy.conf.j2
     dest: /etc/zabbix/zabbix_proxy.conf
-    owner: zabbix
-    group: zabbix
+    owner: "{{ zabbix_os_user }}"
+    group: "{{ zabbix_os_user }}"
     mode: "{{ zabbix_proxy_conf_mode }}"
   notify: restart zabbix-proxy
   become: true
