@@ -12,6 +12,9 @@ platforms:
       - name: zabbix
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    groups:
+      - ${MY_MOLECULE_INTERPRETER:-python3}
+      - ${MY_MOLECULE_VERSION:-v62}
 
 provisioner:
   name: ansible
@@ -22,8 +25,16 @@ provisioner:
     ANSIBLE_ROLES_PATH: $HOME/.ansible/collections/ansible_collections/community/zabbix/roles
   inventory:
     group_vars:
-      all:
+      python3:
         ansible_python_interpreter: /usr/bin/python3
+      python:
+        ansible_python_interpreter: /usr/bin/python
+      v62:
+        zabbix_javagateway_version: 6.2
+      v60:
+        zabbix_javagateway_version: 6.0
+      v50:
+        zabbix_javagateway_version: 5.0
 
 verifier:
   name: testinfra
