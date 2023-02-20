@@ -51,3 +51,5 @@ sign_keys:
       sign_key: E709712C
     bullseye:
       sign_key: E709712C
+    jammy:
+      sign_key: E709712C
