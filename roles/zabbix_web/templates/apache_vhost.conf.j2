@@ -1,5 +1,5 @@
-<VirtualHost {{ zabbix_apache_vhost_listen_ip }}:{{ zabbix_apache_vhost_port }}>
-  ServerName {{ zabbix_apache_servername }}
+<VirtualHost {{ zabbix_web_vhost_listen_ip }}:{{ zabbix_web_vhost_port }}>
+  ServerName {{ zabbix_web_server_name }}
   {% for alias in zabbix_url_aliases %}
   ServerAlias {{ alias }}
   {% endfor %}
@@ -7,7 +7,7 @@
   ## Vhost docroot
   DocumentRoot "/usr/share/zabbix"
 
-{% if zabbix_apache_redirect and zabbix_apache_tls %}
+{% if zabbix_web_redirect|default(false) and zabbix_web_tls|default(false) %}
   RewriteEngine On
   RewriteCond %{HTTPS} !=on
   RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R,L]
@@ -51,9 +51,9 @@
 
 {% endfor %}
   ## Logging
-  ErrorLog "/var/log/{{ _apache_log }}/{{ zabbix_apache_servername }}_error.log"
+  ErrorLog "/var/log/{{ _apache_log }}/{{ zabbix_web_server_name }}_error.log"
   ServerSignature Off
-  CustomLog "/var/log/{{ _apache_log }}/{{ zabbix_apache_servername }}_access.log" combined
+  CustomLog "/var/log/{{ _apache_log }}/{{ zabbix_web_server_name }}_access.log" combined
 
   ## Rewrite rules
   RewriteEngine On
@@ -84,17 +84,17 @@
 </VirtualHost>
 
 {# Set up TLS vhosts #}
-{% if zabbix_apache_tls and zabbix_apache_vhost_tls_port %}
+{% if zabbix_web_tls and zabbix_web_vhost_tls_port %}
 
-SSLPassPhraseDialog {{ zabbix_apache_SSLPassPhraseDialog }}
-SSLSessionCache         {{ zabbix_apache_SSLSessionCache }}
-SSLSessionCacheTimeout  {{ zabbix_apache_SSLSessionCacheTimeout }}
+{{ (zabbix_web_SSLPassPhraseDialog is defined and zabbix_web_SSLPassPhraseDialog is not none) | ternary('', '# ') }}SSLPassPhraseDialog {{ zabbix_web_SSLPassPhraseDialog | default('') }}
+{{ (zabbix_web_SSLSessionCache is defined and zabbix_web_SSLSessionCache is not none) | ternary('', '# ') }}SSLSessionCache {{ zabbix_web_SSLSessionCache | default('') }}
+{{ (zabbix_web_SSLSessionCacheTimeout is defined and zabbix_web_SSLSessionCacheTimeout is not none) | ternary('', '# ') }}SSLSessionCacheTimeout {{ zabbix_web_SSLSessionCacheTimeout | default('') }}
+{{ (zabbix_web_SSLCryptoDevice is defined and zabbix_web_SSLCryptoDevice is not none) | ternary('', '# ') }}SSLCryptoDevice {{ zabbix_web_SSLCryptoDevice | default('') }}
 SSLRandomSeed startup file:/dev/urandom  256
 SSLRandomSeed connect builtin
-SSLCryptoDevice {{ zabbix_apache_SSLCryptoDevice }}
 
-<VirtualHost _default_:{{ zabbix_apache_vhost_tls_port }}>
-  ServerName {{ zabbix_apache_servername }}
+<VirtualHost {{ zabbix_web_vhost_listen_ip }}:{{ zabbix_web_vhost_tls_port }}>
+  ServerName {{ zabbix_web_server_name }}
   {% for alias in zabbix_url_aliases %}
   ServerAlias {{ alias }}
   {% endfor %}
@@ -103,17 +103,14 @@ SSLCryptoDevice {{ zabbix_apache_SSLCryptoDevice }}
   DocumentRoot "/usr/share/zabbix"
 
   SSLEngine on
-  SSLCipherSuite {{ apache_ssl_cipher_suite }}
-  SSLProtocol {{ apache_ssl_protocol }}
-  SSLHonorCipherOrder On
-{% if apache_vhosts_version == "2.4" %}
+  {{ (zabbix_web_ssl_cipher_suite is defined and zabbix_web_ssl_cipher_suite is not none) | ternary('', '# ') }}SSLCipherSuite {{ zabbix_web_ssl_cipher_suite | default('') }}
+  {{ (zabbix_web_ssl_cipher_suite is defined and zabbix_web_ssl_cipher_suite is not none) | ternary('', '# ') }}SSLHonorCipherOrder On
+{% if apache_version|string() == '2.4' %}
   SSLCompression off
 {% endif %}
-  SSLCertificateFile {{ zabbix_apache_tls_crt }}
-  SSLCertificateKeyFile {{ zabbix_apache_tls_key }}
-{% if zabbix_apache_tls_chain %}
-  SSLCertificateChainFile {{ zabbix_apache_tls_chain }}
-{% endif %}
+  SSLCertificateFile {{ zabbix_web_tls_crt }}
+  SSLCertificateKeyFile {{ zabbix_web_tls_key }}
+  {{ (zabbix_web_tls_chain is defined and zabbix_web_tls_chain is not none) | ternary('', '# ') }}SSLCertificateChainFile {{ zabbix_web_tls_chain | default('') }}
 
 {% set directory_paths = ['/usr/share/zabbix/conf', '/usr/share/zabbix/app', '/usr/share/zabbix/include', '/usr/share/zabbix/include/classes'] %}
 
@@ -153,9 +150,9 @@ SSLCryptoDevice {{ zabbix_apache_SSLCryptoDevice }}
 
 {% endfor %}
   ## Logging
-  ErrorLog "/var/log/{{ _apache_log }}/{{ zabbix_apache_servername }}_tls_error.log"
+  ErrorLog "/var/log/{{ _apache_log }}/{{ zabbix_web_server_name }}_tls_error.log"
   ServerSignature Off
-  CustomLog "/var/log/{{ _apache_log }}/{{ zabbix_apache_servername }}_tls_access.log" combined
+  CustomLog "/var/log/{{ _apache_log }}/{{ zabbix_web_server_name }}_tls_access.log" combined
 
   ## Rewrite rules
   RewriteEngine On

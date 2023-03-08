@@ -1,9 +1,12 @@
 ---
-
-- name: "Include Zabbix gpg ids"
+- name: "Debian | Include Zabbix gpg ids"
   include_vars: zabbix.yml
 
-- name: "Set short version name"
+- name: "Debian | Set Some Variables"
+  set_fact:
+    _zabbix_web_apache_php_addition: true
+
+- name: "Debian | Set short version name"
   set_fact:
     zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
 
@@ -51,10 +54,6 @@
     - init
     - config
 
-- name: "Debian | Install PHP apart from zabbix-frontend-php deps"
-  include_tasks: "php_Debian.yml"
-  when: zabbix_php_install
-
 - name: "Debian | Install zabbix-web"
   apt:
     pkg: "zabbix-frontend-php{{ '-deprecated' if zabbix_php_frontend_deprecated else '' }}"
@@ -74,8 +73,8 @@
 
 - name: "Debian | Link graphfont.ttf (workaround ZBX-10467)"
   file:
-    src: '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
-    path: '/usr/share/zabbix/fonts/graphfont.ttf'
+    src: "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+    path: "/usr/share/zabbix/fonts/graphfont.ttf"
     state: link
   tags:
     - zabbix-web
@@ -98,11 +97,6 @@
 - name: "Including Apache Configuration"
   include_tasks: apache_Debian.yml
   vars:
-    zabbix_apache_servername: "{{ zabbix_websrv_servername }}"
+    zabbix_web_server_name: "{{ zabbix_web_server_name }}"
   when:
-    - zabbix_websrv == 'apache'
-
-- name: "Configure SELinux when enabled"
-  include_tasks: selinux.yml
-  when:
-    - zabbix_selinux | bool
+    - zabbix_web_http_server == 'apache'

@@ -2,12 +2,12 @@
 
 server {
 {% if not zabbix_nginx_tls %}
-    listen {{ zabbix_nginx_vhost_port }};
+    listen {{ zabbix_web_vhost_port }};
 {% else %}
 {% if zabbix_letsencrypt %}
     listen 80;
     server_tokens off;
-    server_name     {{ zabbix_websrv_servername }} {% for alias in zabbix_url_aliases -%}{{ alias -}} {% endfor %};
+    server_name     {{ zabbix_web_server_name }} {% for alias in zabbix_url_aliases -%}{{ alias -}} {% endfor %};
     location ^~ /.well-known/acme-challenge {
         root {{ zabbix_letsencrypt_webroot_path | default('/var/www/letsencrypt') }};
         # disables IP restrictions and HTTP auth
@@ -15,15 +15,15 @@ server {
         default_type text/plain;
         try_files $uri =404;
     }
-    location / { return 301 https://$host:{{ zabbix_nginx_vhost_tls_port }}$request_uri; }
+    location / { return 301 https://$host:{{ zabbix_web_vhost_tls_port }}$request_uri; }
 }
 
 server {
 {% endif %}
-    listen {{ zabbix_nginx_vhost_tls_port }} ssl;
+    listen {{ zabbix_web_vhost_tls_port }} ssl;
 {% if zabbix_letsencrypt and zabbix_letsencrypt_cert.stat.exists %}
-    ssl_certificate /etc/letsencrypt/live/{{ zabbix_websrv_servername }}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/{{ zabbix_websrv_servername }}/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/{{ zabbix_web_server_name }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ zabbix_web_server_name }}/privkey.pem;
 {% else %}
     ssl_certificate {{ zabbix_nginx_tls_crt }};
     ssl_certificate_key {{ zabbix_nginx_tls_key }};
@@ -39,7 +39,7 @@ server {
 
 {% endif %}
     server_tokens off;
-    server_name     {{ zabbix_websrv_servername }} {% for alias in zabbix_url_aliases -%}{{ alias -}} {% endfor %};
+    server_name     {{ zabbix_web_server_name }} {% for alias in zabbix_url_aliases -%}{{ alias -}} {% endfor %};
 
 {% if zabbix_web_allowlist_ips is defined and zabbix_web_allowlist_ips %}
     # Allow list IPs via zabbix_web_allowlist_ips

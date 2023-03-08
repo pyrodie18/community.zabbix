@@ -130,9 +130,9 @@ The following is an overview of all available configuration defaults for this ro
 
 #### Apache configuration
 
-* `zabbix_apache_vhost_port`: The port on which Zabbix HTTP vhost is running.
-* `zabbix_apache_vhost_tls_port`: The port on which Zabbix HTTPS vhost is running.
-* `zabbix_apache_vhost_listen_ip`: On which interface the Apache Virtual Host is available.
+* `zabbix_web_vhost_port`: The port on which Zabbix HTTP vhost is running.
+* `zabbix_web_vhost_tls_port`: The port on which Zabbix HTTPS vhost is running.
+* `zabbix_web_vhost_listen_ip`: On which interface the Apache Virtual Host is available.
 * `zabbix_apache_can_connect_ldap`: Default: `false`. Set SELinux boolean to allow httpd to connect to LDAP.
 * `zabbix_php_install`: Default: `true`. True / False. Switch for extra install of packages for PHP, currently on for Debian/Ubuntu.
 * `zabbix_web_max_execution_time`:
@@ -141,24 +141,24 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_web_upload_max_filesize`:
 * `zabbix_web_max_input_time`:
 * `zabbix_apache_include_custom_fragment`: Default: `true`. Includes php_value vars max_execution_time, memory_limit, post_max_size, upload_max_filesize, max_input_time and date.timezone in vhost file.. place those in php-fpm configuration.
-* `zabbix_apache_tls`: If the Apache vhost should be configured with TLS encryption or not.
-* `zabbix_apache_redirect`: If a redirect should take place from HTTP to HTTPS
-* `zabbix_apache_tls_crt`: The path to the TLS certificate file.
-* `zabbix_apache_tls_key`: The path to the TLS key file.
-* `zabbix_apache_tls_chain`: The path to the TLS certificate chain file.
-* `zabbix_apache_SSLPassPhraseDialog`: Type of pass phrase dialog for encrypted private keys.
-* `zabbix_apache_SSLSessionCache`: Type of the global/inter-process SSL Session Cache
-* `zabbix_apache_SSLSessionCacheTimeout`: Number of seconds before an SSL session expires in the Session Cache
-* `zabbix_apache_SSLCryptoDevice`: Enable use of a cryptographic hardware accelerator
+* `zabbix_web_tls`: If the Apache vhost should be configured with TLS encryption or not.
+* `zabbix_web_redirect`: If a redirect should take place from HTTP to HTTPS
+* `zabbix_web_tls_crt`: The path to the TLS certificate file.
+* `zabbix_web_tls_key`: The path to the TLS key file.
+* `zabbix_web_tls_chain`: The path to the TLS certificate chain file.
+* `zabbix_web_SSLPassPhraseDialog`: Type of pass phrase dialog for encrypted private keys.
+* `zabbix_web_SSLSessionCache`: Type of the global/inter-process SSL Session Cache
+* `zabbix_web_SSLSessionCacheTimeout`: Number of seconds before an SSL session expires in the Session Cache
+* `zabbix_web_SSLCryptoDevice`: Enable use of a cryptographic hardware accelerator
 
-When `zabbix_apache_tls_crt`, `zabbix_apache_tls_key` and/or `zabbix_apache_tls_chain` are used, make sure that these files exists before executing this role. The Zabbix-Web role will not install the mentioned files.
+When `zabbix_web_tls_crt`, `zabbix_web_tls_key` and/or `zabbix_web_tls_chain` are used, make sure that these files exists before executing this role. The Zabbix-Web role will not install the mentioned files.
 
 See https://httpd.apache.org/docs/current/mod/mod_ssl.html for SSL* configuration options for Apache HTTPD.
 
 #### Nginx configuration
 
-* `zabbix_nginx_vhost_port`: The port on which Zabbix HTTP vhost is running.
-* `zabbix_nginx_vhost_tls_port`: The port on which Zabbix HTTPS vhost is running.
+* `zabbix_web_vhost_port`: The port on which Zabbix HTTP vhost is running.
+* `zabbix_web_vhost_tls_port`: The port on which Zabbix HTTPS vhost is running.
 * `zabbix_nginx_tls`: If the Nginx vhost should be configured with TLS encryption or not.
 * `zabbix_nginx_tls_crt`: The path to the TLS certificate file.
 * `zabbix_nginx_tls_key`: The path to the TLS key file.
@@ -192,7 +192,7 @@ The following properties are specific to Zabbix 5.0 and for the PHP(-FPM) config
 
 * `zabbix_server_name`: The name of the Zabbix Server.
 * `zabbix_server_database`: The type of database used. Can be: mysql or pgsql
-* `zabbix_server_database_long`: The type of database used, but long name. Can be: mysql or postgresql
+* `zabbix_db_type_long`: The type of database used, but long name. Can be: mysql or postgresql
 * `zabbix_server_hostname`: The hostname on which the zabbix-server is running. Default set to: {{ inventory_hostname }}
 * `zabbix_server_listenport`: On which port the Zabbix Server is available. Default: 10051
 * `zabbix_server_dbhost`: The hostname on which the database is running.
@@ -236,12 +236,12 @@ When there is one host running both Zabbix Server and the Zabbix Web (Running My
     - role: geerlingguy.php
     - role: community.zabbix.zabbix_server
       zabbix_server_database: mysql
-      zabbix_server_database_long: mysql
+      zabbix_db_type_long: mysql
       zabbix_server_dbport: 3306
     - role: community.zabbix.zabbix_web
       zabbix_api_server_url: zabbix.mydomain.com
       zabbix_server_database: mysql
-      zabbix_server_database_long: mysql
+      zabbix_db_type_long: mysql
       zabbix_server_dbport: 3306
 ```
 
@@ -255,7 +255,7 @@ This is a two host setup. On one host (Named: "zabbix-server") the Zabbix Server
   roles:
     - role: community.zabbix.zabbix_server
       zabbix_server_database: mysql
-      zabbix_server_database_long: mysql
+      zabbix_db_type_long: mysql
       zabbix_server_dbport: 3306
 
 - hosts: zabbix-web
@@ -267,7 +267,7 @@ This is a two host setup. On one host (Named: "zabbix-server") the Zabbix Server
       zabbix_api_server_url: zabbix.mydomain.com
       zabbix_server_hostname: zabbix-server
       zabbix_server_database: mysql
-      zabbix_server_database_long: mysql
+      zabbix_db_type_long: mysql
       zabbix_server_dbport: 3306
 ```
 
@@ -294,7 +294,7 @@ zabbix.conf.php, for example to add LDAP CA certificates. To do this add a `zabb
       zabbix_api_server_url: zabbix.mydomain.com
       zabbix_server_hostname: zabbix-server
       zabbix_server_database: mysql
-      zabbix_server_database_long: mysql
+      zabbix_db_type_long: mysql
       zabbix_server_dbport: 3306
       zabbix_web_env:
         LDAPTLS_CACERT: /etc/ssl/certs/ourcert.pem
