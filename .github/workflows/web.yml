@@ -29,7 +29,7 @@ jobs:
           - debian11
           - debian10
         collection_role:
-          - zabbix_server
+          - zabbix_web
         database:
           - mysql
           - pgsql
