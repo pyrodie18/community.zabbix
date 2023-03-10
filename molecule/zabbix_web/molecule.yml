@@ -42,10 +42,13 @@ provisioner:
         ansible_python_interpreter: /usr/bin/python
       v62:
         zabbix_server_version: 6.2
+        zabbix_web_version: 6.2
       v60:
         zabbix_server_version: 6.0
+        zabbix_web_version: 6.0
       v50:
         zabbix_server_version: 5.0
+        zabbix_web_version: 5.0
       mysql:
         zabbix_server_database: mysql
         zabbix_server_database_long: mysql
