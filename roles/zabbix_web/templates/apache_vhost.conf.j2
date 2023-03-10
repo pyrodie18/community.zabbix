@@ -1,5 +1,5 @@
 <VirtualHost {{ zabbix_web_vhost_listen_ip }}:{{ zabbix_web_vhost_port }}>
-  ServerName {{ zabbix_web_server_name }}
+  ServerName {{ zabbix_api_server_url }}
   {% for alias in zabbix_url_aliases %}
   ServerAlias {{ alias }}
   {% endfor %}
@@ -51,9 +51,9 @@
 
 {% endfor %}
   ## Logging
-  ErrorLog "/var/log/{{ _apache_log }}/{{ zabbix_web_server_name }}_error.log"
+  ErrorLog "/var/log/{{ _apache_log }}/{{ zabbix_api_server_url }}_error.log"
   ServerSignature Off
-  CustomLog "/var/log/{{ _apache_log }}/{{ zabbix_web_server_name }}_access.log" combined
+  CustomLog "/var/log/{{ _apache_log }}/{{ zabbix_api_server_url }}_access.log" combined
 
   ## Rewrite rules
   RewriteEngine On
@@ -94,7 +94,7 @@ SSLRandomSeed startup file:/dev/urandom  256
 SSLRandomSeed connect builtin
 
 <VirtualHost {{ zabbix_web_vhost_listen_ip }}:{{ zabbix_web_vhost_tls_port }}>
-  ServerName {{ zabbix_web_server_name }}
+  ServerName {{ zabbix_api_server_url }}
   {% for alias in zabbix_url_aliases %}
   ServerAlias {{ alias }}
   {% endfor %}
@@ -150,9 +150,9 @@ SSLRandomSeed connect builtin
 
 {% endfor %}
   ## Logging
-  ErrorLog "/var/log/{{ _apache_log }}/{{ zabbix_web_server_name }}_tls_error.log"
+  ErrorLog "/var/log/{{ _apache_log }}/{{ zabbix_api_server_url }}_tls_error.log"
   ServerSignature Off
-  CustomLog "/var/log/{{ _apache_log }}/{{ zabbix_web_server_name }}_tls_access.log" combined
+  CustomLog "/var/log/{{ _apache_log }}/{{ zabbix_api_server_url }}_tls_access.log" combined
 
   ## Rewrite rules
   RewriteEngine On

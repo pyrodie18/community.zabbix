@@ -34,6 +34,8 @@ provisioner:
     ANSIBLE_ROLES_PATH: $HOME/.ansible/collections/ansible_collections/community/zabbix/roles
   inventory:
     group_vars:
+      all:
+        zabbix_api_server_url: zabbix-web-${MY_MOLECULE_CONTAINER:-centos}
       python3:
         ansible_python_interpreter: /usr/bin/python3
       python:
