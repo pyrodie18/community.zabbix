@@ -12,7 +12,6 @@
 - name: Set More Variables
   set_fact:
     zabbix_valid_version: "{{ zabbix_web_version|float in zabbix_valid_web_versions[ansible_distribution_major_version] }}"
-    zabbix_php_fpm_listen: "{{ zabbix_php_fpm_listen if zabbix_php_fpm_listen is defined else _zabbix_php_fpm_listen }}"
     zabbix_db_type_long: "{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}"
 
 - name: Stopping Install of Invalid Version
@@ -28,6 +27,12 @@
 - name: Set PHP Version
   set_fact:
     zabbix_web_php_installed_version: "{{ _zabbix_web_php_installed_version.stdout }}"
+
+- name: Set PHP Variables
+  set_fact:
+    zabbix_php_fpm_listen: "{{ zabbix_php_fpm_listen if zabbix_php_fpm_listen is defined else _zabbix_php_fpm_listen }}"
+    zabbix_php_fpm_dir: "{{ zabbix_php_fpm_dir if zabbix_php_fpm_dir is defined else _php_fpm_dir }}"
+    zabbix_php_fpm_session: "{{ zabbix_php_fpm_session if zabbix_php_fpm_session is defined else _php_fpm_session }}"
 
 - name: Include OS Specific Tasks
   include_tasks: "{{ ansible_os_family }}.yml"
@@ -62,3 +67,17 @@
     - zabbix-web
     - init
     - config
+
+- name: "Debian | Install PHP"
+  template:
+    src: php-fpm.conf.j2
+    dest: "{{ zabbix_php_fpm_dir }}/zabbix.conf"
+    owner: "{{ zabbix_web_user }}"
+    group: "{{ zabbix_web_group }}"
+    mode: 0644
+  become: true
+  when:
+    - zabbix_vhost
+    - ansible_os_family == "Debian"
+  notify:
+    - restart php-fpm-version

@@ -58,29 +58,6 @@
   ## Rewrite rules
   RewriteEngine On
   RewriteRule ^$ /index.php [L]
-
-{% if _zabbix_web_apache_php_addition | default(false) %}
-{% if zabbix_apache_include_custom_fragment | default(true) %}
-  ## Custom fragment
-  {% if zabbix_php_fpm %}
-  ProxyPassMatch ^/(.*\.php(/.*)?)$ fcgi://127.0.0.1:9000/usr/share/zabbix/$1
-  ProxyTimeout 1800
-  {% else %}
-  php_value max_execution_time {{ zabbix_web_max_execution_time | default('300') }}
-  php_value memory_limit {{ zabbix_web_memory_limit | default('128M') }}
-  php_value post_max_size {{ zabbix_web_post_max_size | default('16M') }}
-  php_value upload_max_filesize {{ zabbix_web_upload_max_filesize | default('2M') }}
-  php_value max_input_time {{ zabbix_web_max_input_time | default('300') }}
-
-  {% if zabbix_version is version('5.0', '>=') %}
-  php_value max_input_vars {{ zabbix_web_max_input_vars | default('10000') }}
-  {% endif %}
-
-  # Set correct timezone.
-  php_value date.timezone {{ zabbix_timezone }}
-  {% endif %}
-{% endif %}
-{% endif %}
 </VirtualHost>
 
 {# Set up TLS vhosts #}
@@ -158,27 +135,5 @@ SSLRandomSeed connect builtin
   RewriteEngine On
   RewriteRule ^$ /index.php [L]
 
-{% if _zabbix_web_apache_php_addition | default(false) %}
-{% if zabbix_apache_include_custom_fragment | default(true) %}
-  ## Custom fragment
-  {% if zabbix_php_fpm %}
-  ProxyPassMatch ^/(.*\.php(/.*)?)$ fcgi://127.0.0.1:9000/usr/share/zabbix/$1
-  ProxyTimeout 1800
-  {% else %}
-  php_value max_execution_time {{ zabbix_web_max_execution_time | default('300') }}
-  php_value memory_limit {{ zabbix_web_memory_limit | default('128M') }}
-  php_value post_max_size {{ zabbix_web_post_max_size | default('16M') }}
-  php_value upload_max_filesize {{ zabbix_web_upload_max_filesize | default('2M') }}
-  php_value max_input_time {{ zabbix_web_max_input_time | default('300') }}
-
-  {% if zabbix_version is version('5.0', '>=') %}
-  php_value max_input_vars {{ zabbix_web_max_input_vars | default('10000') }}
-  {% endif %}
-
-  # Set correct timezone.
-  php_value date.timezone {{ zabbix_timezone }}
-  {% endif %}
-{% endif %}
-{% endif %}
 </VirtualHost>
 {% endif %}

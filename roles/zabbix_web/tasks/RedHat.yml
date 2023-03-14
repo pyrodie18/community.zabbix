@@ -2,9 +2,10 @@
   set_fact:
     zabbix_web_php_installed_version: "{{ zabbix_web_php_installed_version | regex_replace('\\.', '') }}"
 
-- name: "RedHat | Define YUM Repositories"
+- name: "RedHat | Update Variables for Centos 7"
   set_fact:
     zabbix_repo_yum: "{{ zabbix_repo_yum + zabbix_5_repo_yum }}"
+    zabbix_web_php_dependencies: "{{ zabbix_web_php_dependencies_centos7 }}"
   when:
     - zabbix_web_version is version('5.0', '==')
     - ansible_distribution_major_version == '7'

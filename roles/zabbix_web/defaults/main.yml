@@ -18,15 +18,13 @@ zabbix_web_htpasswd_file: /etc/zabbix/web/htpasswd
 zabbix_timezone: Europe/Amsterdam
 zabbix_vhost: true
 
-# zabbix_php_frontend_deprecated: false
+# Deb Variables
+zabbix_web_apt_priority:
+
 # zabbix_php_fpm: false
 # zabbix_php_fpm_dir_etc: /etc/opt/rh/rh-php72/
 # zabbix_php_fpm_dir_var: /var/opt/rh/rh-php72/
 zabbix_php_fpm_conf_listen: true
-# zabbix_php_fpm_conf_enable_user: true
-# zabbix_php_fpm_conf_enable_group: true
-# zabbix_php_fpm_conf_mode: "0664"
-# zabbix_php_fpm_conf_enable_mode: true
 
 zabbix_web_vhost_port: 80
 zabbix_web_vhost_tls_port: 443

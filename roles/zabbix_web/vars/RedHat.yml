@@ -29,13 +29,13 @@ zabbix_valid_web_versions:
   "7":
     - 5.0
 
-# zabbix_web_php_dependencies:
-#   - "php{{ zabbix_web_php_installed_version }}-php-gd"
-#   - "php{{ zabbix_web_php_installed_version }}-php-bcmath"
-#   - "php{{ zabbix_web_php_installed_version }}-php-xml"
-#   - "php{{ zabbix_web_php_installed_version }}-php-mbstring"
-#   - "php{{ zabbix_web_php_installed_version }}-php-ldap"
-#   - "php{{ zabbix_web_php_installed_version }}-php-{{ 'pgsql' if zabbix_server_database == 'pgsql' else 'mysqlnd' }}"
+zabbix_web_php_dependencies_centos7:
+  - "rh-php72-php-gd"
+  - "rh-php72-php-bcmath"
+  - "rh-php72-php-xml"
+  - "rh-php72-php-mbstring"
+  - "rh-php72-php-ldap"
+  - "rh-php72-php-{{ 'pgsql' if zabbix_server_database == 'pgsql' else 'mysqlnd' }}"
 
 zabbix_web_php_dependencies:
   - "php-gd"

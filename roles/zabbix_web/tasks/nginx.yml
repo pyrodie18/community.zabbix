@@ -34,7 +34,7 @@
 
 - name: "Let's Encrypt | check for certificate created by certbot"
   stat:
-    path: "/etc/letsencrypt/live/{{ zabbix_web_server_name }}/fullchain.pem"
+    path: "/etc/letsencrypt/live/{{ zabbix_api_server_url }}/fullchain.pem"
   register: zabbix_letsencrypt_cert
   failed_when: false
   when: zabbix_letsencrypt
@@ -61,9 +61,9 @@
   notify:
     - restart nginx
 
-- name: "Let's Encrypt | Check if zabbix_web_server_name is resolvable"
+- name: "Let's Encrypt | Check if zabbix_api_server_url is resolvable"
   set_fact:
-    zabbix_websrv_servername_ip: "{{ lookup('dig', 'qtype=A', zabbix_web_server_name) }}"
+    zabbix_websrv_servername_ip: "{{ lookup('dig', 'qtype=A', zabbix_api_server_url) }}"
   changed_when: zabbix_websrv_servername_ip != ansible_default_ipv4.address
   register: zabbix_letsencrypt_resolve
   when: zabbix_letsencrypt
@@ -87,10 +87,10 @@
     certbot --non-interactive certonly --expand
     -a webroot --webroot-path={{ zabbix_letsencrypt_webroot_path }}
     --email {{ zabbix_letsencrypt_account_email }} --agree-tos
-    --cert-name {{ zabbix_web_server_name }}
-    -d {{ zabbix_web_server_name }}
+    --cert-name {{ zabbix_api_server_url }}
+    -d {{ zabbix_api_server_url }}
   args:
-    creates: "/etc/letsencrypt/live/{{ zabbix_web_server_name }}/fullchain.pem"
+    creates: "/etc/letsencrypt/live/{{ zabbix_api_server_url }}/fullchain.pem"
   when:
     - zabbix_letsencrypt
     - zabbix_letsencrypt_resolve is not changed
@@ -98,7 +98,7 @@
 
 - name: "Let's Encrypt | Check for certificate created by certbot"
   stat:
-    path: "/etc/letsencrypt/live/{{ zabbix_web_server_name }}/fullchain.pem"
+    path: "/etc/letsencrypt/live/{{ zabbix_api_server_url }}/fullchain.pem"
   register: zabbix_letsencrypt_cert
   failed_when: false
   when: zabbix_letsencrypt

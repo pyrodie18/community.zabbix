@@ -37,3 +37,12 @@
     - restart apache
   tags:
     - zabbix-server
+
+- name: "Apache | Enable Site (Debian Only)"
+  file:
+    src: "{{ zabbix_web_apache_vhost_location }}"
+    dest: /etc/apache2/sites-enabled/zabbix.conf
+    state: link
+    owner: root
+    group: root
+  when: ansible_os_family == "Debian"
