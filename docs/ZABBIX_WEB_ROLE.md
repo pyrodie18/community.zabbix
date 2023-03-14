@@ -117,8 +117,8 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_timezone`: Default: `Europe/Amsterdam`. This is the timezone. The Apache Virtual Host needs this parameter.
 * `zabbix_vhost`: Default: `true`. When you don't want to create an Apache Virtual Host configuration, you can set it to False.
 * `zabbix_web_env`: (Optional) A Dictionary of PHP Environments settings.
-* `zabbix_web_conf_web_user`: When provided, the user (which should already exist on the host) will be used for ownership for web/php related processes. (Default set to either `apache` (`www-data` for Debian) or `nginx`).
-* `zabbix_web_conf_web_group`: When provided, the group (which should already exist on the host) will be used for ownership for web/php related processes. (Default set to either `apache` (`www-data` for Debian) or `nginx`).
+* `zabbix_web_user`: When provided, the user (which should already exist on the host) will be used for ownership for web/php related processes. (Default set to either `apache` (`www-data` for Debian) or `nginx`).
+* `zabbix_web_group`: When provided, the group (which should already exist on the host) will be used for ownership for web/php related processes. (Default set to either `apache` (`www-data` for Debian) or `nginx`).
 * `zabbix_web_htpasswd`: (Optional) Allow HTTP authentication at the webserver level via a htpasswd file.
 * `zabbix_web_htpasswd_file`: Default: `/etc/zabbix/web/htpasswd`. Allows the change the default path to the htpasswd file.
 * `zabbix_web_htpasswd_users`: (Optional) Dictionary for creating users via `htpasswd_user` and passphrases via `htpasswd_pass` in htpasswd file.
@@ -175,16 +175,13 @@ When `zabbix_nginx_tls_crt` and `zabbix_nginx_tls_key` are used, make sure that 
 
 The following properties are specific to Zabbix 5.0 and for the PHP(-FPM) configuration:
 
-* `zabbix_php_version`: Either `7.3` or `7.4` (Based on the OS Family). When you want to override the PHP Version.
 * `zabbix_php_fpm_session`: The directory where sessions will be stored. If none are provided, defaults are used.
 * `zabbix_php_fpm_listen`: The path to a socket file or ipaddress:port combination on which PHP-FPM needs to listen. If none are provided, defaults are used.
 * `zabbix_php_fpm_conf_listen`: Default: `true`. If we want to configure the `zabbix_php_fpm_listen` in the PHP-FPM configuration file.
 * `zabbix_php_fpm_conf_user`: The owner of the socket file (When `zabbix_php_fpm_listen` contains a patch to a socket file).
-* `zabbix_php_fpm_conf_enable_user`: Default: `true`. If we want to configure the owner of the `zabbix_php_fpm_listen` in the PHP-FPM configuration file.
+
 * `zabbix_php_fpm_conf_group`: The group of the owner of the socket file (When `zabbix_php_fpm_listen` contains a patch to a socket file).
-* `zabbix_php_fpm_conf_enable_group`: Default: `true`. If we want to configure the group of the `zabbix_php_fpm_listen` in the PHP-FPM configuration file.
-* `zabbix_php_fpm_conf_mode`: The mode for the socket file (When `zabbix_php_fpm_listen` contains a patch to a socket file).
-* `zabbix_php_fpm_conf_enable_mode`: Default: `true`. If we want to configure the mode of the `zabbix_php_fpm_listen` in the PHP-FPM configuration file.
+
 * `zabbix_php_fpm_dir_etc`: etc HOME root directory of PHP-FPM setup.
 * `zabbix_php_fpm_dir_var`: Var HOME root directory of PHP-FPM setup.
 
@@ -192,7 +189,6 @@ The following properties are specific to Zabbix 5.0 and for the PHP(-FPM) config
 
 * `zabbix_server_name`: The name of the Zabbix Server.
 * `zabbix_server_database`: The type of database used. Can be: mysql or pgsql
-* `zabbix_db_type_long`: The type of database used, but long name. Can be: mysql or postgresql
 * `zabbix_server_hostname`: The hostname on which the zabbix-server is running. Default set to: {{ inventory_hostname }}
 * `zabbix_server_listenport`: On which port the Zabbix Server is available. Default: 10051
 * `zabbix_server_dbhost`: The hostname on which the database is running.
