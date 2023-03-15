@@ -65,6 +65,22 @@
   yum:
     name:
       - "zabbix-web-{{ zabbix_server_database }}{{ '-scl' if zabbix_web_version is version('5.0', '==') and ansible_distribution_major_version == '7' else '' }}-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}"
+    state: "{{ zabbix_web_package_state }}"
+    update_cache: true
+    disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
+    enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_web_package_install
+  until: zabbix_web_package_install is succeeded
+  become: true
+  tags:
+    - zabbix-web
+
+- name: "RedHat | Install zabbix-web-configuration"
+  yum:
+    name:
       - "zabbix-{{ zabbix_web_http_server }}-conf{{ '-scl' if zabbix_web_version is version('5.0', '==') and ansible_distribution_major_version == '7' else '' }}-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}"
     state: "{{ zabbix_web_package_state }}"
     update_cache: true
@@ -76,5 +92,8 @@
   register: zabbix_web_package_install
   until: zabbix_web_package_install is succeeded
   become: true
+  when:
+    - zabbix_web_version is version('6.0', '!=')
+    - ansible_distribution_major_version == '9'
   tags:
     - zabbix-web
