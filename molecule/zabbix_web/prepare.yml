@@ -99,6 +99,7 @@
           - python3-pip
           - gpg-agent
           - sudo
+          - curl
         update_cache: true
         state: present
       register: installation_dependencies
