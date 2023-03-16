@@ -51,6 +51,24 @@
     - init
     - config
 
+- name: "Debian | Install PgSQL Dependencies"
+  apt:
+    pkg: "php{{ zabbix_web_php_installed_version }}-pgsql"
+    state: "present"
+    update_cache: true
+    cache_valid_time: 0
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_web_php_dependencies_install
+  until: zabbix_web_php_dependencies_install is succeeded
+  become: true
+  when: zabbix_server_database == 'pgsql'
+  tags:
+    - zabbix-web
+    - init
+    - config
+
 - name: "Debian | Install gpg key"
   apt_key:
     id: "{{ sign_keys[zabbix_short_version][ansible_distribution_release]['sign_key'] }}"

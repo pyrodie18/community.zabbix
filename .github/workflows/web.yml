@@ -32,7 +32,7 @@ jobs:
           - zabbix_web
         database:
           - mysql
-          # - pgsql
+          - pgsql
         web_server:
           - apache
         version:
