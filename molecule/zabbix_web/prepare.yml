@@ -31,7 +31,7 @@
       no_log: true
       with_items: "{{ molecule_yml.platforms }}"
       when:
-        - '"postgresql" in item.groups'
+        - '"pgsql" in item.groups'
 
 - name: Prepare
   hosts: all
@@ -182,33 +182,6 @@
       when:
         - ansible_distribution_major_version >= '22'
         - ansible_os_family == "Debian"
-
-    - name: Print some debug information
-      set_fact:
-        msg: |
-          Module Variables ("vars"):
-          --------------------------------
-          {{ vars | to_nice_json }} 
-
-          Environment Variables ("environment"):
-          --------------------------------
-          {{ environment | to_nice_json }} 
-
-          GROUP NAMES Variables ("group_names"):
-          --------------------------------
-          {{ group_names | to_nice_json }}
-
-          GROUPS Variables ("groups"):
-          --------------------------------
-          {{ groups | to_nice_json }}
-
-          HOST Variables ("hostvars"):
-          --------------------------------
-          {{ hostvars | to_nice_json }}
-
-    - name: debug
-      debug:
-        msg: "{{ msg.split('\n') }}"
 
   roles:
     - role: geerlingguy.apache
