@@ -159,7 +159,7 @@ See https://httpd.apache.org/docs/current/mod/mod_ssl.html for SSL* configuratio
 
 * `zabbix_web_vhost_port`: The port on which Zabbix HTTP vhost is running.
 * `zabbix_web_vhost_tls_port`: The port on which Zabbix HTTPS vhost is running.
-* `zabbix_nginx_tls`: If the Nginx vhost should be configured with TLS encryption or not.
+* `zabbix_web_tls`: If the Nginx vhost should be configured with TLS encryption or not.
 * `zabbix_nginx_tls_crt`: The path to the TLS certificate file.
 * `zabbix_nginx_tls_key`: The path to the TLS key file.
 * `zabbix_nginx_tls_dhparam`: The path to the TLS DHParam file.

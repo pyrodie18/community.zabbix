@@ -34,7 +34,7 @@ jobs:
           - mysql
           - pgsql
         web_server:
-          - apache
+          - nginx
         version:
           - v62
           - v60

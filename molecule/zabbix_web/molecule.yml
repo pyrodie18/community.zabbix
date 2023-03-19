@@ -69,9 +69,10 @@ provisioner:
         zabbix_server_pgsql_login_password: changeme
         zabbix_server_pgsql_login_port: 5432
       apache:
-        zabbix_websrv: apache
+        zabbix_web_http_server: apache
       nginx:
-        zabbix_websrv: nginx
+        zabbix_web_http_server: nginx
+        php_webserver_daemon: nginx
 
 verifier:
   name: testinfra

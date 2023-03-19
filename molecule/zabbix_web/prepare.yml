@@ -186,10 +186,10 @@
   roles:
     - role: geerlingguy.apache
       when:
-        - zabbix_websrv == "apache"
+        - zabbix_web_http_server == "apache"
     - role: geerlingguy.nginx
       when:
-        - zabbix_websrv == "nginx"
+        - zabbix_web_http_server == "nginx"
     - role: geerlingguy.php
     - role: zabbix_server
 
