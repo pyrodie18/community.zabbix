@@ -49,7 +49,6 @@ zabbix_web_redirect_secure: false
 
 zabbix_repo_yum_gpgcheck: 0
 zabbix_repo_yum_schema: https
-zabbix_repo_yum_disabled: "*"
 zabbix_repo_yum_enabled: []
 zabbix_repo_yum:
   - name: zabbix
