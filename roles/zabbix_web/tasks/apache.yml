@@ -24,7 +24,7 @@
     - name: "RedHat | Install zabbix-apache-conf"
       yum:
         name:
-          - "zabbix-apache-conf{{ '-scl' if zabbix_web_version is version('5.0', '==') and ansible_distribution_major_version == '7' else '' }}-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}"
+          - "zabbix-apache-conf-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}"
         state: "{{ zabbix_web_package_state }}"
         update_cache: true
         disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
