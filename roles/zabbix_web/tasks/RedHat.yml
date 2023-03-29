@@ -78,7 +78,7 @@
 - name: "RedHat | Install zabbix-web-{{ zabbix_server_database }}"
   yum:
     name:
-      - "zabbix-web-{{ zabbix_server_database }}-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}"
+      - "zabbix-web-{{ zabbix_server_database }}"
     state: "{{ zabbix_web_package_state }}"
     update_cache: true
     disablerepo: "{{ zabbix_repo_yum_disabled | default(omit) }}"
@@ -95,7 +95,7 @@
 - name: "RedHat | Install zabbix-web-configuration"
   yum:
     name:
-      - "zabbix-{{ zabbix_web_http_server }}-conf-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}"
+      - "zabbix-{{ zabbix_web_http_server }}-conf"
     state: "{{ zabbix_web_package_state }}"
     update_cache: true
     disablerepo: "{{ zabbix_repo_yum_disabled | default(omit) }}"
