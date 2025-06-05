@@ -169,7 +169,7 @@ class TemplateGroup(ZabbixBase):
         return group_ids, group_list
 
     def propagate(self, template_groups, propagate):
-        if LooseVersion(self._zbx_api_version) < LooseVersion("6.2"):
+        if LooseVersion(self._zbx_api_version) == LooseVersion("6.0"):
             return False
         group_ids, group_list = self.get_group_ids(template_groups)
         groups = list(map(lambda group_id: {"groupid": group_id}, group_ids))

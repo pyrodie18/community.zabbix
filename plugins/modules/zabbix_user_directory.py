@@ -326,7 +326,7 @@ EXAMPLES = r"""
   ansible.builtin.set_fact:
     ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
 
-- name: Create new user directory or update existing info (Zabbix <= 6.2)
+- name: Create new user directory or update existing info (Zabbix == 6.0)
   # set task level variables as we change ansible_connection plugin here
   vars:
     ansible_network_os: community.zabbix.zabbix
@@ -348,7 +348,7 @@ EXAMPLES = r"""
     search_filter: "(%{attr}=test_user)"
     start_tls: 0
 
-- name: Create new user directory with LDAP IDP or update existing info (Zabbix >= 6.4)
+- name: Create new user directory with LDAP IDP or update existing info (Zabbix >= 7.0)
   # set task level variables as we change ansible_connection plugin here
   vars:
     ansible_network_os: community.zabbix.zabbix
@@ -384,7 +384,7 @@ EXAMPLES = r"""
         user_groups:
           - Guests
 
-- name: Create new user directory with SAML IDP or update existing info (Zabbix >= 6.4)
+- name: Create new user directory with SAML IDP or update existing info (Zabbix >= 7.0)
   # set task level variables as we change ansible_connection plugin here
   vars:
     ansible_network_os: community.zabbix.zabbix
@@ -522,154 +522,146 @@ def main():
 
     user_directory = ZabbixBase(module)
 
-    if LooseVersion(user_directory._zbx_api_version) < LooseVersion("6.2"):
-        module.fail_json(msg="Zabbix < 6.2 does not support user directories.")
+    if LooseVersion(user_directory._zbx_api_version) == LooseVersion("6.0"):
+        module.fail_json(msg="Zabbix == 6.0 does not support user directories.")
 
-    if LooseVersion(user_directory._zbx_api_version) < LooseVersion("6.4"):
-        parameters["search_filter"] = module.params["search_filter"]
-        directory = user_directory._zapi.userdirectory.get(
-            {"filter": {"name": parameters["name"]}}
+    if state == "present" and not module.params["idp_type"]:
+        module.fail_json(
+            "'idp_type' parameter must be provided when state is 'present'"
         )
-    else:
-        # Zabbix >= 6.4
-        # Mandatory parameters check
-        if state == "present" and not module.params["idp_type"]:
+    if module.params["idp_type"]:
+        if module.params["idp_type"] == "ldap" and (
+            not module.params["host"]
+            or not module.params["port"]
+            or not module.params["base_dn"]
+            or not module.params["search_attribute"]
+        ):
             module.fail_json(
-                "'idp_type' parameter must be provided when state is 'present'"
+                "'host', 'port', 'base_dn', 'search_attribute' must be provided when idp_type is 'ldap'"
             )
-        if module.params["idp_type"]:
-            if module.params["idp_type"] == "ldap" and (
-                not module.params["host"]
-                or not module.params["port"]
-                or not module.params["base_dn"]
-                or not module.params["search_attribute"]
-            ):
-                module.fail_json(
-                    "'host', 'port', 'base_dn', 'search_attribute' must be provided when idp_type is 'ldap'"
-                )
-            if module.params["idp_type"] == "saml" and (
-                not module.params["idp_entityid"]
-                or not module.params["sp_entityid"]
-                or not module.params["sso_url"]
-                or not module.params["username_attribute"]
-            ):
-                module.fail_json(
-                    "'idp_entityid', 'sp_entityid', 'sso_url', 'username_attribute' must be provided when idp_type is 'ldap'"
-                )
-
-        directory = user_directory._zapi.userdirectory.get(
-            {
-                "search": {"name": parameters["name"]},
-                "selectProvisionMedia": "extend",
-                "selectProvisionGroups": "extend",
-            }
-        )
-        parameters["idp_type"] = str(
-            zabbix_utils.helper_to_numeric_value(
-                ["", "ldap", "saml"], module.params["idp_type"]
+        if module.params["idp_type"] == "saml" and (
+            not module.params["idp_entityid"]
+            or not module.params["sp_entityid"]
+            or not module.params["sso_url"]
+            or not module.params["username_attribute"]
+        ):
+            module.fail_json(
+                "'idp_entityid', 'sp_entityid', 'sso_url', 'username_attribute' must be provided when idp_type is 'ldap'"
             )
+
+    directory = user_directory._zapi.userdirectory.get(
+        {
+            "search": {"name": parameters["name"]},
+            "selectProvisionMedia": "extend",
+            "selectProvisionGroups": "extend",
+        }
+    )
+    parameters["idp_type"] = str(
+        zabbix_utils.helper_to_numeric_value(
+            ["", "ldap", "saml"], module.params["idp_type"]
         )
-        if parameters["idp_type"] == "1":
-            # idp_type is ldap
-            parameters["search_filter"] = module.params["search_filter"]
-        elif parameters["idp_type"] == "2":
-            # idp_type is saml
-            for p in [
-                "idp_entityid",
-                "sso_url",
-                "username_attribute",
-                "sp_entityid",
-                "slo_url",
-                "nameid_format",
-            ]:
-                # str parameters
-                if module.params[p]:
-                    parameters[p] = module.params[p]
-            for p in [
-                "scim_status",
-                "encrypt_nameid",
-                "encrypt_assertions",
-                "sign_messages",
-                "sign_assertions",
-                "sign_authn_requests",
-                "sign_logout_requests",
-                "sign_logout_responses",
-            ]:
-                # boolean parameters
-                if module.params[p]:
-                    parameters[p] = str(int(module.params[p]))
-
-        if module.params["provision_status"]:
-            parameters["provision_status"] = int(module.params["provision_status"])
-
-        if module.params["provision_media"]:
-            if (
-                "provision_status" not in parameters
-                or not parameters["provision_status"]
-            ):
-                module.fail_json(
-                    "'provision_status' must be True to define 'provision_media'"
-                )
-            parameters["provision_media"] = []
-            for media in module.params["provision_media"]:
-                media_type_name = media["mediatype"]
-                media_type_ids = user_directory._zapi.mediatype.get(
-                    {"filter": {"name": media_type_name}}
-                )
-                if not media_type_ids:
-                    module.fail_json("Mediatype '%s' cannot be found" % media_type_name)
-                parameters["provision_media"].append(
-                    {
-                        "name": media["name"],
-                        "mediatypeid": media_type_ids[0]["mediatypeid"],
-                        "attribute": media["attribute"],
-                    }
-                )
-
-        if module.params["provision_groups"]:
-            if (
-                "provision_status" not in parameters
-                or not parameters["provision_status"]
-            ):
-                module.fail_json(
-                    "'provision_status' must be True to define 'provision_groups'"
-                )
-            parameters["provision_groups"] = []
-            for group in module.params["provision_groups"]:
-                role_name = group["role"]
-                role_ids = user_directory._zapi.role.get(
-                    {"filter": {"name": role_name}}
-                )
-                if not role_ids:
-                    module.fail_json("Role '%s' cannot be found" % role_name)
-                user_groups = []
-                for user_group in group["user_groups"]:
-                    ug_ids = user_directory._zapi.usergroup.get(
-                        {"filter": {"name": user_group}}
-                    )
-                    if not ug_ids:
-                        module.fail_json("User group '%s' cannot be found" % user_group)
-                    user_groups.append({"usrgrpid": ug_ids[0]["usrgrpid"]})
-                parameters["provision_groups"].append(
-                    {
-                        "name": group["name"],
-                        "roleid": role_ids[0]["roleid"],
-                        "user_groups": user_groups,
-                    }
-                )
+    )
+    if parameters["idp_type"] == "1":
+        # idp_type is ldap
+        parameters["search_filter"] = module.params["search_filter"]
+    elif parameters["idp_type"] == "2":
+        # idp_type is saml
         for p in [
-            "group_basedn",
-            "group_filter",
-            "group_member",
-            "group_membership",
-            "group_name",
-            "group_name",
-            "user_lastname",
-            "user_ref_attr",
-            "user_username",
+            "idp_entityid",
+            "sso_url",
+            "username_attribute",
+            "sp_entityid",
+            "slo_url",
+            "nameid_format",
         ]:
+            # str parameters
             if module.params[p]:
                 parameters[p] = module.params[p]
+        for p in [
+            "scim_status",
+            "encrypt_nameid",
+            "encrypt_assertions",
+            "sign_messages",
+            "sign_assertions",
+            "sign_authn_requests",
+            "sign_logout_requests",
+            "sign_logout_responses",
+        ]:
+            # boolean parameters
+            if module.params[p]:
+                parameters[p] = str(int(module.params[p]))
+
+    if module.params["provision_status"]:
+        parameters["provision_status"] = int(module.params["provision_status"])
+
+    if module.params["provision_media"]:
+        if (
+            "provision_status" not in parameters
+            or not parameters["provision_status"]
+        ):
+            module.fail_json(
+                "'provision_status' must be True to define 'provision_media'"
+            )
+        parameters["provision_media"] = []
+        for media in module.params["provision_media"]:
+            media_type_name = media["mediatype"]
+            media_type_ids = user_directory._zapi.mediatype.get(
+                {"filter": {"name": media_type_name}}
+            )
+            if not media_type_ids:
+                module.fail_json("Mediatype '%s' cannot be found" % media_type_name)
+            parameters["provision_media"].append(
+                {
+                    "name": media["name"],
+                    "mediatypeid": media_type_ids[0]["mediatypeid"],
+                    "attribute": media["attribute"],
+                }
+            )
+
+    if module.params["provision_groups"]:
+        if (
+            "provision_status" not in parameters
+            or not parameters["provision_status"]
+        ):
+            module.fail_json(
+                "'provision_status' must be True to define 'provision_groups'"
+            )
+        parameters["provision_groups"] = []
+        for group in module.params["provision_groups"]:
+            role_name = group["role"]
+            role_ids = user_directory._zapi.role.get(
+                {"filter": {"name": role_name}}
+            )
+            if not role_ids:
+                module.fail_json("Role '%s' cannot be found" % role_name)
+            user_groups = []
+            for user_group in group["user_groups"]:
+                ug_ids = user_directory._zapi.usergroup.get(
+                    {"filter": {"name": user_group}}
+                )
+                if not ug_ids:
+                    module.fail_json("User group '%s' cannot be found" % user_group)
+                user_groups.append({"usrgrpid": ug_ids[0]["usrgrpid"]})
+            parameters["provision_groups"].append(
+                {
+                    "name": group["name"],
+                    "roleid": role_ids[0]["roleid"],
+                    "user_groups": user_groups,
+                }
+            )
+    for p in [
+        "group_basedn",
+        "group_filter",
+        "group_member",
+        "group_membership",
+        "group_name",
+        "group_name",
+        "user_lastname",
+        "user_ref_attr",
+        "user_username",
+    ]:
+        if module.params[p]:
+            parameters[p] = module.params[p]
 
     if not directory:
         # No User Directory found with given name
