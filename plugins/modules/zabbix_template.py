@@ -405,6 +405,7 @@ class Template(ZabbixBase):
                 update_rules["templateDashboards"] = update_rules.pop("templateScreens")
 
                 # before Zabbix 6.2 host_groups and template_group are joined into groups parameter
+                self._module.fail_json(msg=f"api version: {self._zbx_api_version}")
                 if LooseVersion(self._zbx_api_version) == LooseVersion("6.0"):
                     update_rules["groups"] = {"createMissing": True}
                     update_rules.pop("host_groups", None)
