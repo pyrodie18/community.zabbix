@@ -1,9 +1,9 @@
 ---
-- name: test - do not run tests for Zabbix < 6.2
+- name: test - do not run tests for Zabbix < 7.0
   meta: end_play
-  when: zabbix_version is version('6.2', '<')
+  when: zabbix_version is version('7.0', '<')
 
-- name: test - user directory for Zabbix < 6.4
+- name: test - user directory for Zabbix < 7.0
   module_defaults:
     community.zabbix.zabbix_user_directory:
       state: present
@@ -102,9 +102,9 @@
     - ansible.builtin.assert:
         that: directory_update_again_result.changed is sameas False
 
-  when: zabbix_version is version('6.4', '<')
+  when: zabbix_version is version('7.0', '==')
 
-- name: test - user directory for Zabbix >= 6.4
+- name: test - user directory for Zabbix >= 7.0
   module_defaults:
     community.zabbix.zabbix_user_directory:
       state: present
@@ -434,4 +434,4 @@
     - ansible.builtin.assert:
         that: directory_create_mappings_again_result.changed is sameas False
 
-  when: zabbix_version is version('6.4', '>=')
+  when: zabbix_version is version('7.0', '>=')
