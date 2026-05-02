@@ -37,6 +37,43 @@
   tags:
     - database
   block:
+    - name: "MySQL | Register active MySQL authentication plugins"
+      community.mysql.mysql_query:
+        login_user: "{{ zabbix_server_mysql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_server_mysql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_server_mysql_login_host | default(omit) }}"
+        login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
+        login_db: "mysql"
+        query: "SELECT PLUGIN_NAME FROM INFORMATION_SCHEMA.PLUGINS WHERE PLUGIN_TYPE='AUTHENTICATION' AND PLUGIN_STATUS='ACTIVE';"
+      register: _zabbix_server_auth_plugins
+
+    - name: MySQL | Ensure that user selected authentication plugin is supported by the MySQL server
+      when: zabbix_server_mysql_auth_plugin | length > 0
+      ansible.builtin.assert:
+        that:
+          - zabbix_server_mysql_auth_plugin in _zabbix_server_auth_plugins_list
+      vars:
+        _zabbix_server_auth_plugins_list: "{{ _zabbix_server_auth_plugins.query_result | flatten | map(attribute='PLUGIN_NAME') }}"
+
+    # Selects best authentication plugin based on the list order of _zabbix_server_auth_plugin_priority
+    - name: MySQL | Determine best authentication plugin
+      when: zabbix_server_mysql_auth_plugin | length == 0 
+      ansible.builtin.set_fact:
+        zabbix_server_mysql_auth_plugin: >-
+          {{ _zabbix_server_auth_plugin_priority | select('in', _zabbix_server_auth_plugins_list) | first }}
+      vars:
+        _zabbix_server_auth_plugins_list: "{{ _zabbix_server_auth_plugins.query_result | flatten | map(attribute='PLUGIN_NAME') }}"
+        _zabbix_server_auth_plugin_priority:
+          - caching_sha2_password
+          - sha256_password
+          - mysql_native_password
+
+    - name: MySQL | Ensure that user selected salt for authentication plugin is 20 characters long
+      when: zabbix_server_mysql_auth_plugin in ['caching_sha2_password', 'sha256_password']
+      ansible.builtin.assert:
+        that:
+          - zabbix_server_mysql_auth_salt | length == 20
+
     - name: "MySQL | Create database"
       community.mysql.mysql_db:
         login_user: "{{ zabbix_server_mysql_login_user | default(omit) }}"
@@ -60,10 +97,16 @@
         login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
         check_hostname: "{{ zabbix_server_dbtlsconnect is defined and zabbix_server_dbtlsconnect != '' }}"
         name: "{{ zabbix_server_dbuser }}"
-        password: "{{ zabbix_server_dbpassword }}"
+        password: "{{ _zabbix_server_legacy_auth | ternary(zabbix_server_dbpassword, omit) }}"
+        plugin_auth_string: "{{ _zabbix_server_modern_auth | ternary(zabbix_server_dbpassword, omit) }}"
+        plugin: "{{ zabbix_server_mysql_auth_plugin }}"
+        salt: "{{ _zabbix_server_modern_auth | ternary(zabbix_server_mysql_auth_salt, omit) }}"
         host: "{{ zabbix_server_privileged_host }}"
         priv: "{{ zabbix_server_dbname }}.*:ALL"
         state: present
+      vars:
+        _zabbix_server_legacy_auth: "{{ zabbix_server_mysql_auth_plugin == 'mysql_native_password' }}"
+        _zabbix_server_modern_auth: "{{ zabbix_server_mysql_auth_plugin in ['caching_sha2_password', 'sha256_password'] }}"
 
 - name: "MySQL verify or create schema"
   when: zabbix_server_database_sqlload | bool
