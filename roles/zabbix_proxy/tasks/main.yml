@@ -5,13 +5,8 @@
   tags:
     - always
 
-- name: Set More Variables
-  ansible.builtin.set_fact:
-    zabbix_proxy_db_long: "{{ 'postgresql' if zabbix_proxy_database == 'pgsql' else zabbix_proxy_database }}"
-    zabbix_proxy_fpinglocation: "{{ zabbix_proxy_fpinglocation if zabbix_proxy_fpinglocation is defined else _zabbix_proxy_fpinglocation}}"
-    zabbix_proxy_fping6location: "{{ zabbix_proxy_fping6location if zabbix_proxy_fping6location is defined else _zabbix_proxy_fping6location}}"
-  tags:
-    - always
+- name: Include deprecation checks
+  include_tasks: deprecation_checks.yml
 
 - name: Determine Latest Supported Zabbix Version
   when: zabbix_proxy_version is not defined or zabbix_proxy_version is none
@@ -110,7 +105,7 @@
 - name: "Configure zabbix-proxy"
   ansible.builtin.template:
     src: zabbix_proxy.conf.j2
-    dest: "{{ zabbix_proxy_config }}"
+    dest: "{{ zabbix_proxy_conf_file }}"
     owner: "{{ zabbix_os_user }}"
     group: "{{ zabbix_os_user }}"
     mode: "{{ zabbix_proxy_conf_mode }}"
