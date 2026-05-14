@@ -9,8 +9,10 @@
     enabled: false
   become: true
   when: |
-    ansible_facts.services["zabbix-agent.service"] is defined or
-    ansible_facts.services["zabbix-agent"] is defined
+    (ansible_facts.services["zabbix-agent.service"] is defined and
+    ansible_facts.services["zabbix-agent.service"].status != "not-found") or
+    (ansible_facts.services["zabbix-agent"] is defined and
+    ansible_facts.services["zabbix-agent"].status != "not-found")
 
 - name: "Remove | Package removal"
   ansible.builtin.package:
