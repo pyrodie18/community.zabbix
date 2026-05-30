@@ -201,7 +201,7 @@
     - name: "TimescaleDB | Create hypertables"
       when:
         - _config_db_extension.query_result | length == 0 or 
-          _hypertable_auditlog.query_result | length == 0)
+          _hypertable_auditlog.query_result | length == 0
       community.postgresql.postgresql_db:
         login_user: "{{ zabbix_server_dbuser }}"
         login_password: "{{ zabbix_server_dbpassword }}"
