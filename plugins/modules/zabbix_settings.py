@@ -299,70 +299,60 @@ options:
     timeout_zabbix_agent:
         description:
             - A time of zabbix agent timeout.
-            - This parameter is available since Zabbix 7.0
         required: false
         type: str
 
     timeout_simple_check:
         description:
             - A time of simple check timeout.
-            - This parameter is available since Zabbix 7.0
         required: false
         type: str
 
     timeout_snmp_agent:
         description:
             - A time of SNMP agent timeout.
-            - This parameter is available since Zabbix 7.0
         required: false
         type: str
 
     timeout_external_check:
         description:
             - A time of external check timeout.
-            - This parameter is available since Zabbix 7.0
         required: false
         type: str
 
     timeout_db_monitor:
         description:
             - A time of db monitor timeout.
-            - This parameter is available since Zabbix 7.0
         required: false
         type: str
 
     timeout_http_agent:
         description:
             - A time of HTTP agent timeout.
-            - This parameter is available since Zabbix 7.0
         required: false
         type: str
 
     timeout_ssh_agent:
         description:
             - A time of SSH agent timeout.
-            - This parameter is available since Zabbix 7.0
         required: false
         type: str
 
     timeout_telnet_agent:
         description:
             - A time of telnet agent timeout.
-            - This parameter is available since Zabbix 7.0
         required: false
         type: str
 
     timeout_script:
         description:
             - A time of script timeout.
-            - This parameter is available since Zabbix 7.0
         required: false
         type: str
 
     timeout_browser:
         description:
             - A time of browser timeout.
-            - This parameter is available since Zabbix 7.0
         required: false
         type: str
 
@@ -1043,15 +1033,14 @@ class Settings(ZabbixBase):
                 if geomaps_attribution != current_settings["geomaps_attribution"]:
                     params["geomaps_attribution"] = geomaps_attribution
 
-            if LooseVersion(self._zbx_api_version) >= LooseVersion("7.0"):
-                if isinstance(vault_provider, str):
-                    _vault_provider = str(
-                        zabbix_utils.helper_to_numeric_value(
-                            ["HashiCorp_Vault", "CyberArk_Vault"], vault_provider
-                        )
+            if isinstance(vault_provider, str):
+                _vault_provider = str(
+                    zabbix_utils.helper_to_numeric_value(
+                        ["HashiCorp_Vault", "CyberArk_Vault"], vault_provider
                     )
-                    if _vault_provider != current_settings["vault_provider"]:
-                        params["vault_provider"] = _vault_provider
+                )
+                if _vault_provider != current_settings["vault_provider"]:
+                    params["vault_provider"] = _vault_provider
 
             if params != {}:
                 if self._module.check_mode:

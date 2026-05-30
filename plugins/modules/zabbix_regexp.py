@@ -82,9 +82,6 @@ options:
         default: 'present'
 
 
-notes:
-    - Only Zabbix >= 6.0 is supported.
-
 extends_documentation_fragment:
     - community.zabbix.zabbix
 

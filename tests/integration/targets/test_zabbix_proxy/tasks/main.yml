@@ -1,5 +1,4 @@
 ---
----
 - name: test - create new passive Zabbix proxy server
   community.zabbix.zabbix_proxy:
     proxy_name: zbxproxy_example01

@@ -138,14 +138,12 @@ options:
         type: dict
     address:
         description:
-            - Parameter introduced in Zabbix 7.0.
             - IP address or DNS name to connect to.
             - Required if the Zabbix proxy operating mode is passive
         required: false
         type: str
     port:
         description:
-            - Parameter introduced in Zabbix 7.0.
             - Port number to connect to.
             - supported if the Zabbix proxy operating mode is passive.
         required: false
@@ -153,20 +151,17 @@ options:
         default: "10051"
     proxy_group:
         description:
-            - Parameter introduced in Zabbix 7.0.
             - Proxy group name.
         required: false
         type: str
     local_address:
         description:
-            - Parameter introduced in Zabbix 7.0.
             - Address for active agents. IP address or DNS name to connect to.
             - Required if proxy_groupid is not 0
         required: false
         type: str
     local_port:
         description:
-            - Parameter introduced in Zabbix 7.0.
             - Local proxy port number to connect to.
             - Supported if proxy_groupid is not 0
         required: false
@@ -174,13 +169,11 @@ options:
         default: "10051"
     allowed_addresses:
         description:
-            - Parameter introduced in Zabbix 7.0.
             - Comma-delimited IP addresses or DNS names of active Zabbix proxy.
         required: false
         type: str
     operating_mode:
         description:
-            - Parameter introduced in Zabbix 7.0.
             - Type of proxy.
         required: false
         choices: ["active", "passive"]
@@ -188,7 +181,6 @@ options:
         type: str
     custom_timeouts:
         description:
-            - Parameter introduced in Zabbix 7.0.
             - Whether to override global item timeouts on the proxy level.
             - 0 - use global settings; 1 - override timeouts.
         required: false
@@ -197,7 +189,6 @@ options:
         choices: [0, 1]
     timeout_zabbix_agent:
         description:
-            - Parameter introduced in Zabbix 7.0.
             - Spend no more than this number of seconds on Zabbix agent checks processing.
             - Accepts seconds or time unit with suffix (e.g., 30s, 1m).
             - "Possible values range: 1-600s."
@@ -206,7 +197,6 @@ options:
         type: str
     timeout_simple_check:
         description:
-            - Parameter introduced in Zabbix 7.0.
             - Spend no more than this number of seconds on simple checks processing.
             - Accepts seconds or time unit with suffix (e.g., 30s, 1m).
             - "Possible values range: 1-600s."
@@ -215,7 +205,6 @@ options:
         type: str
     timeout_snmp_agent:
         description:
-            - Parameter introduced in Zabbix 7.0.
             - Spend no more than this number of seconds on SNMP agent checks processing.
             - Accepts seconds or time unit with suffix (e.g., 30s, 1m).
             - "Possible values range: 1-600s."
@@ -224,7 +213,6 @@ options:
         type: str
     timeout_external_check:
         description:
-            - Parameter introduced in Zabbix 7.0.
             - Spend no more than this number of seconds on external checks processing.
             - Accepts seconds or time unit with suffix (e.g., 30s, 1m).
             - "Possible values range: 1-600s."
@@ -233,7 +221,6 @@ options:
         type: str
     timeout_db_monitor:
         description:
-            - Parameter introduced in Zabbix 7.0.
             - Spend no more than this number of seconds on DB checks processing.
             - Accepts seconds or time unit with suffix (e.g., 30s, 1m).
             - "Possible values range: 1-600s."
@@ -242,7 +229,6 @@ options:
         type: str
     timeout_http_agent:
         description:
-            - Parameter introduced in Zabbix 7.0.
             - Spend no more than this number of seconds on HTTPagent checks processing.
             - Accepts seconds or time unit with suffix (e.g., 30s, 1m).
             - "Possible values range: 1-600s."
@@ -251,7 +237,6 @@ options:
         type: str
     timeout_ssh_agent:
         description:
-            - Parameter introduced in Zabbix 7.0.
             - Spend no more than this number of seconds on SSH checks processing.
             - Accepts seconds or time unit with suffix (e.g., 30s, 1m).
             - "Possible values range: 1-600s."
@@ -260,7 +245,6 @@ options:
         type: str
     timeout_telnet_agent:
         description:
-            - Parameter introduced in Zabbix 7.0.
             - Spend no more than this number of seconds on Telnet checks processing.
             - Accepts seconds or time unit with suffix (e.g., 30s, 1m).
             - "Possible values range: 1-600s."
@@ -269,7 +253,6 @@ options:
         type: str
     timeout_script:
         description:
-            - Parameter introduced in Zabbix 7.0.
             - Spend no more than this number of seconds on script type checks processing.
             - Accepts seconds or time unit with suffix (e.g., 30s, 1m).
             - "Possible values range: 1-600s."
@@ -278,7 +261,6 @@ options:
         type: str
     timeout_browser:
         description:
-            - Parameter introduced in Zabbix 7.0.
             - Spend no more than this number of seconds on browser type checks processing.
             - Accepts seconds or time unit with suffix (e.g., 30s, 1m).
             - "Possible values range: 1-600s."
@@ -304,63 +286,7 @@ EXAMPLES = r"""
   ansible.builtin.set_fact:
     ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
 
-- name: Create or update a proxy with proxy type active (Zabbix version < 7.0)
-  # set task level variables as we change ansible_connection plugin here
-  vars:
-    ansible_network_os: community.zabbix.zabbix
-    ansible_connection: httpapi
-    ansible_httpapi_port: 443
-    ansible_httpapi_use_ssl: true
-    ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org
-  community.zabbix.zabbix_proxy:
-    proxy_name: ExampleProxy
-    description: ExampleProxy
-    status: active
-    state: present
-    proxy_address: ExampleProxy.local
-
-- name: Create a new passive proxy using only its IP (Zabbix version < 7.0)
-  # set task level variables as we change ansible_connection plugin here
-  vars:
-    ansible_network_os: community.zabbix.zabbix
-    ansible_connection: httpapi
-    ansible_httpapi_port: 443
-    ansible_httpapi_use_ssl: true
-    ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org
-  community.zabbix.zabbix_proxy:
-    proxy_name: ExampleProxy
-    description: ExampleProxy
-    status: passive
-    state: present
-    interface:
-      useip: 1
-      ip: 10.1.1.2
-      port: 10051
-
-- name: Create a new passive proxy using only its DNS (Zabbix version < 7.0)
-  # set task level variables as we change ansible_connection plugin here
-  vars:
-    ansible_network_os: community.zabbix.zabbix
-    ansible_connection: httpapi
-    ansible_httpapi_port: 443
-    ansible_httpapi_use_ssl: true
-    ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org
-  community.zabbix.zabbix_proxy:
-    proxy_name: ExampleProxy
-    description: ExampleProxy
-    status: passive
-    state: present
-    interface:
-      dns: proxy.example.com
-      port: 10051
-
-- name: Create or update a proxy with proxy type active (Zabbix version >= 7.0)
+- name: Create or update a proxy with proxy type active
   # set task level variables as we change ansible_connection plugin here
   vars:
     ansible_network_os: community.zabbix.zabbix
@@ -377,7 +303,7 @@ EXAMPLES = r"""
     state: present
     allowed_addresses: ExampleProxy.local
 
-- name: Create a new passive proxy using only its IP (Zabbix version >= 7.0)
+- name: Create a new passive proxy using only its IP
   # set task level variables as we change ansible_connection plugin here
   vars:
     ansible_network_os: community.zabbix.zabbix
@@ -395,7 +321,7 @@ EXAMPLES = r"""
     address: 10.1.1.2
     port: 10051
 
-- name: Create a new passive proxy using only its DNS (Zabbix version >= 7.0)
+- name: Create a new passive proxy using only its DNS
   # set task level variables as we change ansible_connection plugin here
   vars:
     ansible_network_os: community.zabbix.zabbix

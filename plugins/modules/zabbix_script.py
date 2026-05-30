@@ -27,7 +27,6 @@ options:
     script_type:
         description:
             - Script type. Required when state is 'present'.
-            - A value of 'url' is only available in 7.0 or later
         type: str
         required: false
         choices: ["script", "ipmi", "ssh", "telnet", "webhook", "url"]
@@ -174,42 +173,36 @@ options:
     user_input_enabled:
         description:
             - Allow advanced user input configuration
-            - Available for Zabbix >= 7.0.
         type: bool
         default: false
     user_input_prompt:
         description:
             - Prompt to display when user input is enabled
             - Required when user_input_enabled is C(True)
-            - Available for Zabbix >= 7.0.
         type: str
     user_input_type:
         description:
             - Choosing 'regex' allows the use of a regular expression
             - Choosing 'dropdown' allows a pre-defined list of choices
             - Required if user_input_enabled is C(true)
-            - Available for Zabbix >= 7.0.
         type: str
         choices: ["regex", "dropdown"]
     user_input_regex:
         description:
             - A regular expression to validate user input
             - Required if user_input_type is C(regex)
-            - Available for Zabbix >= 7.0.
         type: str
     user_input_list:
         description:
             - A list of possible choices for the user.
             - Required if user_input_type is C(dropdown).
             - NOTE the first option will be the default.
-            - Available for Zabbix >= 7.0.
         type: list
         elements: str
     user_input_default_input:
         description:
             - Default user input
             - Available if user_input_type is C(regex)
-            - Available for Zabbix >= 7.0.
         type: str
 extends_documentation_fragment:
 - community.zabbix.zabbix

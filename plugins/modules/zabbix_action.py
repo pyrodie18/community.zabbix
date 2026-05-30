@@ -660,7 +660,6 @@ options:
         description:
             - Whether to pause escalation if event is a symptom event.
             - I(supported) if C(event_source) is set to C(trigger)
-            - Works only with >= Zabbix 7.0
         default: true
 
 

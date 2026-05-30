@@ -142,9 +142,6 @@ class Host(ZabbixBase):
             "selectTags": "extend",
             "selectMacros": "extend"
         }
-        if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
-            parameters["selectGroups"] = parameters["selectHostGroups"]
-            del parameters["selectHostGroups"]
         host_list = self._zapi.host.get(parameters)
         if len(host_list) < 1:
             self._module.fail_json(msg="Host not found: %s" % host_name)
@@ -172,9 +169,6 @@ class Host(ZabbixBase):
                 "selectTags": "extend",
                 "selectMacros": "extend"
             }
-            if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
-                host_get_params["selectGroups"] = host_get_params["selectHostGroups"]
-                del host_get_params["selectHostGroups"]
             host = self._zapi.host.get(host_get_params)
             host[0]["hostinterfaces"] = hostinterface
             host_list.append(host[0])
