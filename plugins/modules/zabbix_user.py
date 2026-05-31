@@ -518,10 +518,9 @@ class User(ZabbixBase):
         ):
             user_parameter_difference_check_result = False
 
-        if LooseVersion(self._zbx_api_version) >= LooseVersion("7.0"):
-            if user_medias:
-                request_data["medias"] = user_medias
-                del request_data["user_medias"]
+        if user_medias:
+            request_data["medias"] = user_medias
+            del request_data["user_medias"]
 
         diff_params = {"before": existing_data, "after": request_data}
 
@@ -566,7 +565,7 @@ class User(ZabbixBase):
             "url": url,
         }
         if user_medias:
-            if LooseVersion(self._zbx_api_version) <= LooseVersion("7.0"):
+            if LooseVersion(self._zbx_api_version) == LooseVersion("7.0"):
                 request_data["user_medias"] = user_medias
             else:
                 request_data["medias"] = user_medias
@@ -644,25 +643,14 @@ class User(ZabbixBase):
 
         request_data, _del_keys = helper_normalize_data(request_data)
 
-        if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
-            try:
-                if user_medias:
-                    request_data["user_medias"] = user_medias
-                user_ids = self._zapi.user.update(request_data)
-            except Exception as e:
-                self._module.fail_json(
-                    msg="Failed to update user %s: %s" % (username, e)
-                )
-
-        if LooseVersion(self._zbx_api_version) >= LooseVersion("7.0"):
-            try:
-                if user_medias:
-                    request_data["medias"] = user_medias
-                user_ids = self._zapi.user.update(request_data)
-            except Exception as e:
-                self._module.fail_json(
-                    msg="Failed to update user %s: %s" % (username, e)
-                )
+        try:
+            if user_medias:
+                request_data["medias"] = user_medias
+            user_ids = self._zapi.user.update(request_data)
+        except Exception as e:
+            self._module.fail_json(
+                msg="Failed to update user %s: %s" % (username, e)
+            )
 
         return user_ids
 

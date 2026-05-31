@@ -300,7 +300,7 @@ EXAMPLES = r"""
   ansible.builtin.set_fact:
     ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
 
-- name: Create new user directory with LDAP IDP or update existing info 
+- name: Create new user directory with LDAP IDP or update existing info
   # set task level variables as we change ansible_connection plugin here
   vars:
     ansible_network_os: community.zabbix.zabbix
@@ -373,7 +373,6 @@ EXAMPLES = r"""
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
-from ansible.module_utils.compat.version import LooseVersion
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
@@ -446,7 +445,7 @@ def main():
             ("state", "present", ("idp_type",)),
             ("idp_type", "ldap", ("host", "port", "base_dn", "search_attribute"), False),
             ("idp_type", "saml", ("idp_entityid", "sp_entityid", "sso_url", "username_attribute"), False),
-            ("provision_status", "true", ("provision_groups"))
+            ("provision_status", "true", ("provision_groups",))
         ]
     )
 

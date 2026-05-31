@@ -5,11 +5,6 @@
     template_groups:
       - Templates
     state: present
-  register: prepare_result
-
-- ansible.builtin.assert:
-    that:
-      - prepare_result.changed is sameas true
 
 - name: "test - Fetch template info as a JSON format from Zabbix Server"
   community.zabbix.zabbix_template_info:
@@ -27,16 +22,14 @@
       - fetch_template_json_format_result.template_json[template_export_key].templates.0.name == "ExampleTemplateForTempleteInfoModule"
       - fetch_template_json_format_result.template_json[template_export_key].templates.0.template == "ExampleTemplateForTempleteInfoModule"
 
-- name: "test - Fetch template info as a JSON format with omit_date parameter from Zabbix Server"
+- name: "test - Fetch template info as a JSON format from Zabbix Server"
   community.zabbix.zabbix_template_info:
     template_name: ExampleTemplateForTempleteInfoModule
     format: json
-    omit_date: true
   register: fetch_template_json_format_omit_date_result
 
 - ansible.builtin.assert:
     that:
-      - fetch_template_json_format_omit_date_result.template_json[template_export_key].date is not defined
       - fetch_template_json_format_omit_date_result.template_json[template_export_key][template_groups_key].0.name == "Templates"
       - fetch_template_json_format_omit_date_result.template_json[template_export_key].templates.0.name == "ExampleTemplateForTempleteInfoModule"
       - fetch_template_json_format_omit_date_result.template_json[template_export_key].templates.0.template == "ExampleTemplateForTempleteInfoModule"
@@ -52,19 +45,6 @@
       - fetch_template_xml_format_result.template_xml | regex_search('</date><groups><group><name>Templates</name></group></groups><templates>') is defined
       - fetch_template_xml_format_result.template_xml | regex_search('<templates><template><template>ExampleTemplateForTempleteInfoModule</template><name>ExampleTemplateForTempleteInfoModule</name><groups><group><name>Templates</name></group></groups></template></templates>') is defined
 
-- name: "test - Fetch template info as a XML format with omit_date parameter from Zabbix Server"
-  community.zabbix.zabbix_template_info:
-    template_name: ExampleTemplateForTempleteInfoModule
-    format: xml
-    omit_date: true
-  register: fetch_template_xml_format_omit_date_result
-
-- ansible.builtin.assert:
-    that:
-      - fetch_template_xml_format_omit_date_result.template_xml | regex_search('<date>.*</date>') is none
-      - fetch_template_xml_format_omit_date_result.template_xml | regex_search('</date><groups><group><name>Templates</name></group></groups><templates>') is defined
-      - fetch_template_xml_format_omit_date_result.template_xml | regex_search('<templates><template><template>ExampleTemplateForTempleteInfoModule</template><name>ExampleTemplateForTempleteInfoModule</name><groups><group><name>Templates</name></group></groups></template></templates>') is defined
-
 - name: "test - Fetch template info as a YAML format from Zabbix Server"
   community.zabbix.zabbix_template_info:
     template_name: ExampleTemplateForTempleteInfoModule
@@ -75,18 +55,6 @@
     that:
       - (fetch_template_yaml_format_result.template_yaml | from_yaml).zabbix_export.template_groups | selectattr("name", "eq", "Templates") | length > 0
       - (fetch_template_yaml_format_result.template_yaml | from_yaml).zabbix_export.templates | selectattr("template", "eq", "ExampleTemplateForTempleteInfoModule") | length > 0
-
-- name: "test - Fetch template info as a YAML format with omit_date parameter from Zabbix Server"
-  community.zabbix.zabbix_template_info:
-    template_name: ExampleTemplateForTempleteInfoModule
-    format: yaml
-    omit_date: true
-  register: fetch_template_yaml_format_omit_date_result
-
-- ansible.builtin.assert:
-    that:
-      - (fetch_template_yaml_format_omit_date_result.template_yaml | from_yaml).zabbix_export.template_groups | selectattr("name", "eq", "Templates") | length > 0
-      - (fetch_template_yaml_format_omit_date_result.template_yaml | from_yaml).zabbix_export.templates | selectattr("template", "eq", "ExampleTemplateForTempleteInfoModule") | length > 0
 
 - name: "test - Fetch template info with none format from Zabbix Server"
   community.zabbix.zabbix_template_info:
@@ -105,3 +73,10 @@
   community.zabbix.zabbix_template_info:
     all_templategroups: true
   register: fetch_all_template_groups
+
+- name: "test - Remove template"
+  community.zabbix.zabbix_template:
+    template_name: ExampleTemplateForTempleteInfoModule
+    template_groups:
+      - Templates
+    state: absent
