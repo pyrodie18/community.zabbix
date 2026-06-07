@@ -243,9 +243,8 @@ class Authentication(ZabbixBase):
             if isinstance(http_case_sensitive, bool):
                 params["http_case_sensitive"] = str(int(http_case_sensitive))
 
-            else:
-                if isinstance(ldap_auth_enabled, bool):
-                    params["ldap_auth_enabled"] = str(int(ldap_auth_enabled))
+            if isinstance(ldap_auth_enabled, bool):
+                params["ldap_auth_enabled"] = str(int(ldap_auth_enabled))
 
             if ldap_userdirectory:
                 directory = self._zapi.userdirectory.get(
