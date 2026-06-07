@@ -1,8 +1,4 @@
 ---
-- name: test - do not run tests with < Zabbix 4.0
-  meta: end_play
-  when: zabbix_version is version('4.0', '<')
-
 - name: support Zabbix version
   block:
     - name: test - try to update regexp (present)
