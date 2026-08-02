@@ -1,0 +1,98 @@
+---
+name: Development environment
+
+on:
+  push:
+    paths:
+      - ".codex/**"
+      - ".devcontainer/**"
+      - ".github/workflows/development-environment.yml"
+      - ".python-version"
+      - "AGENTS.md"
+      - "galaxy.yml"
+      - "meta/**"
+      - "plugins/**"
+      - "pyproject.toml"
+      - "requirements.yml"
+      - "roles/**"
+      - "uv.lock"
+  pull_request:
+    paths:
+      - ".codex/**"
+      - ".devcontainer/**"
+      - ".github/workflows/development-environment.yml"
+      - ".python-version"
+      - "AGENTS.md"
+      - "galaxy.yml"
+      - "meta/**"
+      - "plugins/**"
+      - "pyproject.toml"
+      - "requirements.yml"
+      - "roles/**"
+      - "uv.lock"
+
+permissions:
+  contents: read
+
+jobs:
+  locked-environment:
+    runs-on: ubuntu-latest
+    env:
+      UV_PROJECT_ENVIRONMENT: /tmp/community-zabbix-venv
+    steps:
+      - name: Check out collection at its FQCN path
+        uses: actions/checkout@v6
+        with:
+          path: ansible_collections/community/zabbix
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.15"
+          enable-cache: true
+
+      - name: Install Python
+        run: uv python install 3.12
+        working-directory: ansible_collections/community/zabbix
+
+      - name: Verify lock
+        run: uv lock --check
+        working-directory: ansible_collections/community/zabbix
+
+      - name: Sync environment
+        run: uv sync --frozen --group dev
+        working-directory: ansible_collections/community/zabbix
+
+      - name: Install exact collection dependencies
+        run: >-
+          uv run --frozen ansible-galaxy collection install
+          -r requirements.yml
+          -p "${RUNNER_TEMP}/collections"
+        working-directory: ansible_collections/community/zabbix
+
+      - name: Python lint
+        run: uv run --frozen flake8 plugins
+        working-directory: ansible_collections/community/zabbix
+
+      - name: Changelog lint
+        run: uv run --frozen antsibull-changelog lint
+        working-directory: ansible_collections/community/zabbix
+
+      - name: Sanity tests
+        run: uv run --frozen ansible-test sanity --exclude molecule/ --python 3.12
+        working-directory: ansible_collections/community/zabbix
+
+      - name: Unit tests
+        run: if [[ -d tests/unit ]]; then uv run --frozen ansible-test units --python 3.12; fi
+        working-directory: ansible_collections/community/zabbix
+
+      - name: Build collection
+        run: uv run --frozen ansible-galaxy collection build --force --output-path dist
+        working-directory: ansible_collections/community/zabbix
+
+      - name: Install built collection
+        run: >-
+          uv run --frozen ansible-galaxy collection install --force --no-deps
+          dist/community-zabbix-*.tar.gz
+          -p "${RUNNER_TEMP}/built-collection"
+        working-directory: ansible_collections/community/zabbix

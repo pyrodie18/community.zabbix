@@ -1,0 +1,39 @@
+{
+  "name": "community.zabbix",
+  "image": "ghcr.io/pyrodie18/ansible-dev:2026.08.01.1@sha256:809842b075b72df2ac1e93313909e8950e31349b52039cb0d2eda88066ac889e",
+  "remoteUser": "vscode",
+  "runArgs": [
+    "--security-opt",
+    "seccomp=unconfined"
+  ],
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace/ansible_collections/community/zabbix,type=bind",
+  "workspaceFolder": "/workspace/ansible_collections/community/zabbix",
+  "containerEnv": {
+    "CODEX_HOME": "/home/vscode/.codex",
+    "ANSIBLE_COLLECTIONS_PATH": "/workspace:/home/vscode/.ansible/collections",
+    "SSH_AUTH_SOCK": "/tmp/codex-dev-ssh-agent.sock"
+  },
+  "initializeCommand": "${localEnv:HOME}/devel/dev-environments/scripts/ensure-ssh-agent && install -d -m 0700 -o 1000 -g 1000 ${localEnv:HOME}/.local/state/codex-dev/community.zabbix",
+  "mounts": [
+    "type=bind,source=${localEnv:HOME}/.local/state/codex-dev/community.zabbix,target=/home/vscode/.codex",
+    "type=bind,source=/run/codex-dev-ssh-agent-1000/agent.sock,target=/tmp/codex-dev-ssh-agent.sock",
+    "type=volume,source=community-zabbix-uv-cache,target=/home/vscode/.cache/uv",
+    "type=volume,source=community-zabbix-ansible-cache,target=/home/vscode/.ansible"
+  ],
+  "postCreateCommand": "bootstrap-codex-home community.zabbix && uv sync --frozen --group dev && uv run --frozen ansible-galaxy collection install -r requirements.yml -p /home/vscode/.ansible/collections",
+  "postStartCommand": "setup-codex-project community.zabbix",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "redhat.ansible",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.debugpy",
+        "openai.chatgpt"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "${containerWorkspaceFolder}/.venv/bin/python"
+      }
+    }
+  }
+}

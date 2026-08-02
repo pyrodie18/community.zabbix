@@ -18,9 +18,13 @@ venv.bak/
 .tox/
 
 # ignore dev stuff
-.devcontainer
 local_play.yml
 antsibull-env
+
+# repository-local development state
+.pytest_cache/
+dist/
+*.tar.gz
 
 # Ignore Dependency Roles that may get downloaded
 geerlingguy*

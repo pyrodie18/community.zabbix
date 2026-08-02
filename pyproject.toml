@@ -1,0 +1,23 @@
+[project]
+name = "community-zabbix-development"
+version = "0.0.0"
+description = "Controller and test dependencies for community.zabbix"
+requires-python = ">=3.12,<3.13"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "ansible-core>=2.18.0,<2.19",
+    "ansible-lint>=25.1.0",
+    "antsibull-changelog>=0.34.0",
+    "docker>=7.1.0",
+    "flake8>=7.1.1",
+    "molecule>=25.1.0",
+    "molecule-plugins[docker]>=23.5.0",
+    "netaddr>=1.2.1",
+    "pytest>=8.3.2",
+    "pytest-testinfra>=10.1.1",
+]
+
+[tool.uv]
+package = false

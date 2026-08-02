@@ -26,3 +26,23 @@ dependencies:
   community.mysql: ">=3.10.0"
   community.postgresql: "*"
   community.windows: "*"
+build_ignore:
+  - .ansible
+  - .ansible-lint
+  - .codex
+  - .devcontainer
+  - .github
+  - .gitignore
+  - .python-version
+  - .pytest_cache
+  - .tox
+  - .venv
+  - .vscode
+  - AGENTS.md
+  - dist
+  - pyproject.toml
+  - requirements.txt
+  - requirements.yml
+  - tests/output
+  - tox.ini
+  - uv.lock
